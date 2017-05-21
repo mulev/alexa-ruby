@@ -113,14 +113,22 @@ describe 'Builds appropriate response objects' do
     sample_json = JSON.parse(File.read('fixtures/response-sessionAtt.json')).to_json
     expect(response_json).to eq(sample_json)
   end
-  
-  it 'should create a valid response with an audio stream directive' do
+
+  it 'should create a valid response with a start audio stream directive' do
     response = AlexaRubykit::Response.new
-    response.add_audio_url('http://test/url.mp3','token',100)
+    response.start_audio_playback('http://test/url.mp3', 'token', 100)
     response.build_response_object
     response_json = response.build_response
     sample_json = JSON.parse(File.read('fixtures/response-sessionAudio.json')).to_json
     expect(response_json).to eq(sample_json)
   end
 
+  it 'should create a valid response with a stop audio stream directive' do
+    response = AlexaRubykit::Response.new
+    response.stop_audio_playback
+    response.build_response_object
+    response_json = response.build_response
+    sample_json = JSON.parse(File.read('fixtures/response-sessionStopAudio.json')).to_json
+    expect(response_json).to eq(sample_json)
+  end
 end

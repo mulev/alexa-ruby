@@ -1,6 +1,7 @@
 module AlexaRubykit
   class Response
     require 'json'
+    require 'alexa_rubykit/response/audio_player'
     attr_accessor :version, :session, :response_object, :session_attributes, :speech, :reprompt, :response, :card
 
     # Every response needs a shouldendsession and a version attribute
@@ -24,19 +25,17 @@ module AlexaRubykit
       end
       @speech
     end
-    
-    def add_audio_url(url, token='', offset=0)
-      @directives << {
-        'type' => 'AudioPlayer.Play',
-        'playBehavior' => 'REPLACE_ALL',
-        'audioItem' => {
-          'stream' => {
-            'token' => token,
-            'url' => url,
-            'offsetInMilliseconds' => offset
-          }
-        }
-      }
+
+    # Add a directive to start audio playback
+    def start_audio_playback(url, token = '', offset = 0)
+      player = AudioPlayer.new
+      @directives = [ player.play_directive(url, token, offset) ]
+    end
+
+    # Add directive to stop audio playback
+    def stop_audio_playback
+      player = AudioPlayer.new
+      @directives = [ player.stop_directive ]
     end
 
     def add_reprompt(speech_text, ssml = false)
