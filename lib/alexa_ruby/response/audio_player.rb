@@ -1,4 +1,4 @@
-module AlexaRubykit
+module AlexaRuby
   # AudioPlayer class encapsulates all Alexa audio player directives
   class AudioPlayer
     # Build an AudioPlayer.Play directive

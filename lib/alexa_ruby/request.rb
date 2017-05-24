@@ -17,13 +17,13 @@ module AlexaRuby
       @json   = json_request
 
       # TODO: We probably need better session handling.
-      @session = AlexaRubykit::Session.new(json_request['session'])
+      @session = AlexaRuby::Session.new(json_request['session'])
     end
   end
 
   # Builds a new request for Alexa.
   def self.build_request(json_request)
-    raise ArgumentError, 'Invalid Alexa Request.' unless AlexaRubykit.valid_alexa?(json_request)
+    raise ArgumentError, 'Invalid Alexa Request.' unless AlexaRuby.valid_alexa?(json_request)
     @request = nil
     case json_request['request']['type']
       when /Launch/

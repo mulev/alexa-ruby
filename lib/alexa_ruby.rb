@@ -13,7 +13,7 @@ module AlexaRuby
 
   # Prints the Gem version.
   def self.print_version
-    p AlexaRubykit::VERSION
+    p AlexaRuby::VERSION
   end
 
   # Returns true if all the Alexa request objects are set.

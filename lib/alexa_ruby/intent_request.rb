@@ -24,7 +24,7 @@ module AlexaRuby
 
     # Takes a JSON Object and symbolizes its keys.
     def add_slots(slots)
-      slot_hash = AlexaRubykit.transform_keys_to_symbols(value)
+      slot_hash = AlexaRuby.transform_keys_to_symbols(value)
       add_hash_slots(slot_hash)
     end
 
