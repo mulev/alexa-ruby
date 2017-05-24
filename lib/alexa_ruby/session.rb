@@ -1,4 +1,4 @@
-module AlexaRubykit
+module AlexaRuby
   # Handles the session object in request.
   class Session
     attr_accessor :new, :session_id, :attributes, :user

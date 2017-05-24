@@ -1,11 +1,11 @@
-module AlexaRubykit
+module AlexaRuby
 # Echo can send 3 types of requests
 # - LaunchRequest: The start of the app.
 # - IntentRequest: The intent of the app.
 # - SessionEndedRequest: Session has ended.
   class Request
     require 'json'
-    require 'alexa_rubykit/session'
+    require 'alexa_ruby/session'
     attr_accessor :version, :type, :session, :json # global
     attr_accessor :request_id, :locale # on request
 

@@ -1,4 +1,4 @@
-module AlexaRubykit
+module AlexaRuby
   class LaunchRequest  < Request
     # We still don't know if all of the parameters in the request are required.
     # Checking for the presence of intent on an IntentRequest.

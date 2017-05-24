@@ -1,5 +1,5 @@
 # Session end request class.
-module AlexaRubykit
+module AlexaRuby
   class SessionEndedRequest < Request
     attr_accessor :reason
 

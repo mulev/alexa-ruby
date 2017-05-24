@@ -1,7 +1,7 @@
-module AlexaRubykit
+module AlexaRuby
   class Response
     require 'json'
-    require 'alexa_rubykit/response/audio_player'
+    require 'alexa_ruby/response/audio_player'
     attr_accessor :version, :session, :response_object, :session_attributes, :speech, :reprompt, :response, :card
 
     # Every response needs a shouldendsession and a version attribute

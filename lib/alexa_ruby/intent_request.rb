@@ -1,4 +1,4 @@
-module AlexaRubykit
+module AlexaRuby
   class IntentRequest < Request
     attr_accessor :intent, :name, :slots
 

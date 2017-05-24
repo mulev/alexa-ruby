@@ -1,11 +1,11 @@
-require 'alexa_rubykit/request'
-require 'alexa_rubykit/version'
-require 'alexa_rubykit/response'
-require 'alexa_rubykit/intent_request'
-require 'alexa_rubykit/launch_request'
-require 'alexa_rubykit/session_ended_request'
+require 'alexa_ruby/request'
+require 'alexa_ruby/version'
+require 'alexa_ruby/response'
+require 'alexa_ruby/intent_request'
+require 'alexa_ruby/launch_request'
+require 'alexa_ruby/session_ended_request'
 
-module AlexaRubykit
+module AlexaRuby
   # Prints a JSON object.
   def self.print_json(json)
     p json

@@ -1,5 +1,5 @@
 require 'rspec'
-require 'alexa_rubykit/response'
+require 'alexa_ruby/response'
 
 describe 'Builds appropriate response objects' do
 
@@ -7,7 +7,7 @@ describe 'Builds appropriate response objects' do
 
   it 'should create valid session responses' do
     # Pair values.
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.add_session_attribute('new', false)
     response.add_session_attribute('sessionId', 'amzn1.echo-api.session.abeee1a7-aee0-41e6-8192-e6faaed9f5ef')
     session = response.build_session
@@ -16,7 +16,7 @@ describe 'Builds appropriate response objects' do
     expect(session[:sessionAttributes]).to include(:sessionId)
 
     # Empty.
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     session = response.build_session
     expect(session).to include(:sessionAttributes)
     expect(session[:sessionAttributes]).to be_empty
@@ -24,7 +24,7 @@ describe 'Builds appropriate response objects' do
 
   # TODO: Add cards.
   it 'should create a valid Alexa say response object' do
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.add_speech('Testing Alexa Rubykit!')
     response_object = response.build_response_object
     expect(response_object).to include(:outputSpeech)
@@ -32,7 +32,7 @@ describe 'Builds appropriate response objects' do
     expect(response_object[:outputSpeech][:text]).to include('Testing Alexa Rubykit!')
 
     # The say_response command should create the same object.
-    response_say = AlexaRubykit::Response.new
+    response_say = AlexaRuby::Response.new
     response_say_object = response_say.say_response('Testing Alexa Rubykit!')
     expect(response_say_object).to eq(response_object)
 
@@ -46,7 +46,7 @@ describe 'Builds appropriate response objects' do
   end
 
   it 'should create a valid SSML Alexa say response object' do
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.add_speech('<speak>Testing SSML Alexa Rubykit support!</speak>',true)
     response_object = response.build_response_object
     expect(response_object).to include(:outputSpeech)
@@ -54,7 +54,7 @@ describe 'Builds appropriate response objects' do
     expect(response_object[:outputSpeech][:ssml]).to include('<speak>Testing SSML Alexa Rubykit support!</speak>')
 
     # The say_response command should create the same object.
-    response_say = AlexaRubykit::Response.new
+    response_say = AlexaRuby::Response.new
     response_say_object = response_say.say_response('<speak>Testing SSML Alexa Rubykit support!</speak>',true,true)
     expect(response_say_object).to eq(response_object)
 
@@ -68,7 +68,7 @@ describe 'Builds appropriate response objects' do
   end
 
   it 'should create a valid SSML Alexa say response object when ssml lacks speak tags' do
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.add_speech('Testing SSML Alexa Rubykit support!',true)
     response_object = response.build_response_object
     expect(response_object).to include(:outputSpeech)
@@ -81,7 +81,7 @@ describe 'Builds appropriate response objects' do
   it 'should create a valid minimum response (body)' do
     # Every response needs a version and a "response object", sessionAttributes is optional.
     # Response Object needs a endsession at a minimum, which we default to true.
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.build_response_object
     response_json = response.build_response
     sample_json = JSON.parse(File.read('fixtures/response-min.json')).to_json
@@ -89,7 +89,7 @@ describe 'Builds appropriate response objects' do
   end
 
   it 'should create a valid card from a hash' do
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.add_hash_card( { :title => 'Ruby Run', :subtitle => 'Ruby Running Ready!' } )
     response_json = response.build_response_object
     sample_json = JSON.parse(File.read('fixtures/sample-card.json'))
@@ -97,7 +97,7 @@ describe 'Builds appropriate response objects' do
   end
 
   it 'should create an empty valid card with a response object.' do
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.add_card
     response_json = response.build_response_object
     sample_json = JSON.parse(File.read('fixtures/card-min.json'))
@@ -105,7 +105,7 @@ describe 'Builds appropriate response objects' do
   end
 
   it 'should create a valid response with some attributes' do
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.add_session_attribute('new', false)
     response.add_session_attribute('sessionId', 'amzn-xxx-yyy-zzz')
     response.build_response_object
@@ -115,7 +115,7 @@ describe 'Builds appropriate response objects' do
   end
 
   it 'should create a valid response with a start audio stream directive' do
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.start_audio_playback('http://test/url.mp3', 'token', 100)
     response.build_response_object
     response_json = response.build_response
@@ -124,7 +124,7 @@ describe 'Builds appropriate response objects' do
   end
 
   it 'should create a valid response with a stop audio stream directive' do
-    response = AlexaRubykit::Response.new
+    response = AlexaRuby::Response.new
     response.stop_audio_playback
     response.build_response_object
     response_json = response.build_response
