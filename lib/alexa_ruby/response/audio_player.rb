@@ -1,33 +1,51 @@
+require 'securerandom'
+require 'uri'
+
 module AlexaRuby
   # AudioPlayer class encapsulates all Alexa audio player directives
   class AudioPlayer
+    attr_accessor :directive
+    
+    # Initialize new directive object
+    def initialize
+      @directive = {}
+    end
+
     # Build an AudioPlayer.Play directive
     #
-    # @param url [String] audio stream URL
-    # @param token [String] some token that represents the audio stream
-    # @param offset [Integer] the timestamp in the stream from which Alexa should begin playback
+    # @param opts [Hash] optional request parameters:
+    #                     - streaming URL
+    #                     - radio station token
+    #                     - expected previous station token
+    #                     - playback offset
     # @return [Hash] AudioPlayer.Play directive
-    def play_directive(url, token, offset)
-      {
-        type: 'AudioPlayer.Play',
-        playBehavior: 'REPLACE_ALL',
-        audioItem: {
-          stream: {
-            token: token,
-            url: url,
-            offsetInMilliseconds: offset
-          }
-        }
-      }
+    def build_play_directive(opts)
+      raise ArgumentError, 'Invalid streaming URL' unless valid_url?(opts[:url])
+      token = opts[:token] || SecureRandom.uuid
+      offset = opts[:offset] || 0
+      @directive[:type] = 'AudioPlayer.Play'
+      @directive[:playBehavior] = 'REPLACE_ALL'
+      @directive[:audioItem] = { stream: {} }
+      @directive[:audioItem][:stream][:url] = opts[:url]
+      @directive[:audioItem][:stream][:token] = token
+      @directive[:audioItem][:stream][:offsetInMilliseconds] = offset
     end
 
     # Build AudioPlayer.Stop directive
     #
     # @return [Hash] AudioPlayer.Stop directive
-    def stop_directive
-      {
-        type: 'AudioPlayer.Stop'
-      }
+    def build_stop_directive
+      @directive[:type] = 'AudioPlayer.Stop'
+    end
+
+    private
+
+    # Is it a valid URL?
+    #
+    # @param url [String] streaming URL
+    # @return [Boolean]
+    def valid_url?(url)
+      url =~ /\A#{URI.regexp(['https'])}\z/
     end
   end
 end

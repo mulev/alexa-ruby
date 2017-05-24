@@ -1,47 +1,28 @@
+require 'alexa_ruby/session'
+
+# AlexaRuby implements a back-end service for interaction with Amazon Alexa API
 module AlexaRuby
-# Echo can send 3 types of requests
-# - LaunchRequest: The start of the app.
-# - IntentRequest: The intent of the app.
-# - SessionEndedRequest: Session has ended.
+  # Abstract request class
   class Request
-    require 'json'
-    require 'alexa_ruby/session'
     attr_accessor :version, :type, :session, :json # global
     attr_accessor :request_id, :locale # on request
 
-    def initialize(json_request)
-      @request_id = json_request['request']['requestId']
-      raise ArgumentError, 'Request ID should exist on all Requests' if @request_id.nil?
-      @version = json_request['version']
-      @locale = json_request['request']['locale']
-      @json   = json_request
+    # Initialize new request object and set object parameters
+    #
+    # @param json [JSON] valid JSON request from Amazon
+    def initialize(json)
+      @request_id = json[:request][:requestId]
+      if @request_id.nil?
+        raise ArgumentError, 'Request ID should exist on all Requests'
+      end
+      @version = json[:version]
+      @locale = json[:request][:locale]
+      @json = json
 
-      # TODO: We probably need better session handling.
-      @session = AlexaRuby::Session.new(json_request['session'])
+      return if @type == :audio_player
+
+      # TODO: We probably need better session handling
+      @session = AlexaRuby::Session.new(json[:session])
     end
-  end
-
-  # Builds a new request for Alexa.
-  def self.build_request(json_request)
-    raise ArgumentError, 'Invalid Alexa Request.' unless AlexaRuby.valid_alexa?(json_request)
-    @request = nil
-    case json_request['request']['type']
-      when /Launch/
-        @request = LaunchRequest.new(json_request)
-      when /Intent/
-        @request = IntentRequest.new(json_request)
-      when /SessionEnded/
-        @request = SessionEndedRequest.new(json_request)
-      else
-        raise ArgumentError, 'Invalid Request Type.'
-    end
-    @request
-  end
-
-  # Take keys of hash and transform those to a symbols
-  def self.transform_keys_to_symbols(value)
-    return value if not value.is_a?(Hash)
-    hash = value.inject({}){|memo,(k,v)| memo[k.to_sym] = self.transform_keys_to_symbols(v); memo}
-    return hash
   end
 end
