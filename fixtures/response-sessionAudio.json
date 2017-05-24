@@ -8,8 +8,8 @@
         "playBehavior": "REPLACE_ALL",
         "audioItem": {
           "stream": {
+            "url": "https://test.ru/url.mp3",
             "token": "token",
-            "url": "http://test/url.mp3",
             "offsetInMilliseconds": 100
           }
         }
