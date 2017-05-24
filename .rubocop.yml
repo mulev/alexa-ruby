@@ -1,3 +1,4 @@
 AllCops:
   Exclude:
     - 'spec/**/*'
+    - 'alexa_ruby.gemspec'
