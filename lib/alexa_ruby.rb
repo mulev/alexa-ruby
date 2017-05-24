@@ -45,7 +45,7 @@ module AlexaRuby
     # @return [Boolean]
     def valid_request?(json)
       session =
-        if json[:request].nil? || json[:request][:type] == /AudioPlayer/
+        if json[:request].nil? || /AudioPlayer/.match(json[:request][:type])
           true
         else
           !json[:session].nil?
