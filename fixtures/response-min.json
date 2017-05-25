@@ -1,7 +1,6 @@
 {
-  "version" : "1.0",
-  "response" :
-    {
-      "shouldEndSession" : true
-    }
+  "version": "1.0",
+  "response": {
+    "shouldEndSession" : true
+  }
 }

@@ -84,24 +84,24 @@ describe 'Builds appropriate response objects' do
     response = AlexaRuby::Response.new
     response.build_response_object
     response_json = response.build_response
-    sample_json = JSON.parse(File.read('fixtures/response-min.json')).to_json
+    sample_json = Oj.to_json(Oj.load(File.read('fixtures/response-min.json')))
     expect(response_json).to eq(sample_json)
   end
 
   it 'should create a valid card from a hash' do
     response = AlexaRuby::Response.new
-    response.add_hash_card( { :title => 'Ruby Run', :subtitle => 'Ruby Running Ready!' } )
+    response.add_card( { :title => 'Ruby Run', :subtitle => 'Ruby Running Ready!' } )
     response_json = response.build_response_object
-    sample_json = JSON.parse(File.read('fixtures/sample-card.json'))
-    expect(response_json.to_json).to eq(sample_json.to_json)
+    sample_json = Oj.to_json(Oj.load(File.read('fixtures/sample-card.json')))
+    expect(Oj.to_json(response_json)).to eq(sample_json)
   end
 
   it 'should create an empty valid card with a response object.' do
     response = AlexaRuby::Response.new
     response.add_card
     response_json = response.build_response_object
-    sample_json = JSON.parse(File.read('fixtures/card-min.json'))
-    expect(response_json.to_json).to eq(sample_json.to_json)
+    sample_json = Oj.to_json(Oj.load(File.read('fixtures/card-min.json')))
+    expect(Oj.to_json(response_json)).to eq(sample_json)
   end
 
   it 'should create a valid response with some attributes' do
@@ -110,25 +110,25 @@ describe 'Builds appropriate response objects' do
     response.add_session_attribute('sessionId', 'amzn-xxx-yyy-zzz')
     response.build_response_object
     response_json = response.build_response
-    sample_json = JSON.parse(File.read('fixtures/response-sessionAtt.json')).to_json
+    sample_json = Oj.to_json(Oj.load(File.read('fixtures/response-sessionAtt.json')))
     expect(response_json).to eq(sample_json)
   end
 
   it 'should create a valid response with a start audio stream directive' do
     response = AlexaRuby::Response.new
-    response.start_audio_playback('http://test/url.mp3', 'token', 100)
+    response.add_audio_player_directive(:start, { url: 'https://test.ru/url.mp3', token: 'token', offset: 100 })
     response.build_response_object
     response_json = response.build_response
-    sample_json = JSON.parse(File.read('fixtures/response-sessionAudio.json')).to_json
+    sample_json = Oj.to_json(Oj.load(File.read('fixtures/response-sessionAudio.json')))
     expect(response_json).to eq(sample_json)
   end
 
   it 'should create a valid response with a stop audio stream directive' do
     response = AlexaRuby::Response.new
-    response.stop_audio_playback
+    response.add_audio_player_directive(:stop)
     response.build_response_object
     response_json = response.build_response
-    sample_json = JSON.parse(File.read('fixtures/response-sessionStopAudio.json')).to_json
+    sample_json = Oj.to_json(Oj.load(File.read('fixtures/response-sessionStopAudio.json')))
     expect(response_json).to eq(sample_json)
   end
 end

@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.add_runtime_dependency 'bundler', '~> 1.7'
   spec.add_runtime_dependency 'rake'
+  spec.add_runtime_dependency 'oj', '~> 3.0'
   spec.add_development_dependency 'rspec', '~> 3.2', '>= 3.2.0'
   spec.add_development_dependency 'rspec-mocks', '~> 3.2', '>= 3.2.0'
 end
