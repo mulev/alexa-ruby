@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['m.mulev@gmail.com']
   spec.summary       = 'Ruby toolkit for Amazon Alexa API'
   spec.description   = 'Ruby toolkit for Amazon Alexa API'
-  spec.homepage      = ''
+  spec.homepage      = 'https://github.com/mulev/alexa-ruby'
   spec.license       = 'MIT'
   spec.files         = Dir['[A-Z]*'] + Dir['lib/**/*'] + Dir['tests/**'] + Dir['bin/**']
   spec.files.reject!   { |fn| fn.include?('.gem') }
