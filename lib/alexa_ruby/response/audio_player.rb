@@ -5,7 +5,7 @@ module AlexaRuby
   # AudioPlayer class encapsulates all Alexa audio player directives
   class AudioPlayer
     attr_accessor :directive
-    
+
     # Initialize new directive object
     def initialize
       @directive = {}

@@ -72,7 +72,7 @@ module AlexaRuby
 
     # Add card that will be shown in Amazon Alexa app on user smartphone/tablet
     #
-    # @param card [Hash] hash with card parameters
+    # @param opts [Hash] hash with card parameters
     # @return [Hash] card object
     def add_card(opts = {})
       opts[:type] = 'Simple' if opts[:type].nil?
