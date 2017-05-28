@@ -18,3 +18,9 @@ mkmf.log
 !.elasticbeanstalk/*.global.yml
 .DS_
 sync-upstream.sh
+
+# Documentation cache and generated files:
+/.yardoc/
+/_yardoc/
+/doc/
+/rdoc/
