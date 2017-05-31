@@ -1,51 +1,44 @@
-require 'securerandom'
-require 'uri'
-
 module AlexaRuby
   # AudioPlayer class encapsulates all Alexa audio player directives
   class AudioPlayer
-    attr_accessor :directive
-
-    # Initialize new directive object
-    def initialize
-      @directive = {}
-    end
-
     # Build an AudioPlayer.Play directive
     #
-    # @param opts [Hash] optional request parameters:
-    #                     - streaming URL
-    #                     - radio station token
-    #                     - expected previous station token
-    #                     - playback offset
+    # @param params [Hash] optional request parameters:
+    #   url [String] streaming URL
+    #   token [String] streaming service token
+    #   offset [Integer] playback offset
     # @return [Hash] AudioPlayer.Play directive
-    def build_play_directive(opts)
-      raise ArgumentError, 'Invalid streaming URL' unless valid_url?(opts[:url])
-      token = opts[:token] || SecureRandom.uuid
-      offset = opts[:offset] || 0
-      @directive[:type] = 'AudioPlayer.Play'
-      @directive[:playBehavior] = 'REPLACE_ALL'
-      @directive[:audioItem] = { stream: {} }
-      @directive[:audioItem][:stream][:url] = opts[:url]
-      @directive[:audioItem][:stream][:token] = token
-      @directive[:audioItem][:stream][:offsetInMilliseconds] = offset
+    def play_directive(params)
+      url = params[:url]
+      token = params[:token] || SecureRandom.uuid
+      offset = params[:offset] || 0
+      build_directive('AudioPlayer.Play', url, token, offset)
     end
 
     # Build AudioPlayer.Stop directive
     #
     # @return [Hash] AudioPlayer.Stop directive
-    def build_stop_directive
-      @directive[:type] = 'AudioPlayer.Stop'
+    def stop_directive
+      build_directive('AudioPlayer.Stop')
     end
 
     private
 
-    # Is it a valid URL?
+    # Set play directive parameters
     #
-    # @param url [String] streaming URL
-    # @return [Boolean]
-    def valid_url?(url)
-      url =~ /\A#{URI.regexp(['https'])}\z/
+    # @param type [String] directive type, can be Play or Stop
+    # @param url [String] streaming service URL
+    # @param token [String] streaming service token
+    # @param offset [Integer] playback offset
+    def build_directive(type, url = nil, token = nil, offset = nil)
+      directive = { type: type }
+      return directive if type == 'AudioPlayer.Stop'
+      directive[:playBehavior] = 'REPLACE_ALL'
+      directive[:audioItem] = { stream: {} }
+      directive[:audioItem][:stream][:url] = url
+      directive[:audioItem][:stream][:token] = token
+      directive[:audioItem][:stream][:offsetInMilliseconds] = offset
+      directive
     end
   end
 end

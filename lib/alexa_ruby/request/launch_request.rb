@@ -1,19 +1,12 @@
 module AlexaRuby
   # LaunchRequest class implements Alexa "LaunchRequest" request type
-  class LaunchRequest < Request
+  class LaunchRequest < BaseRequest
     # Initialize new launch request
     #
-    # @param json [JSON] valid JSON request from Amazon
-    def initialize(json)
+    # @param request [Hash] valid request from Amazon Alexa service
+    def initialize(request)
       @type = :launch
       super
-    end
-
-    # Outputs the launch requestID
-    #
-    # @return [String] launch request ID
-    def to_s
-      "LaunchRequest requestID: #{request_id}"
     end
   end
 end

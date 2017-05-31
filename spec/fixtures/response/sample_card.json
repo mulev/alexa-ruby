@@ -1,0 +1,7 @@
+{
+  "type": "Simple",
+  "title": "title",
+  "content": "text",
+  "small_image_url": "https://test.ru/example_small.jpg",
+  "large_image_url": "https://test.ru/example_large.jpg"
+}

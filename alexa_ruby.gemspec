@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'Ruby toolkit for Amazon Alexa API'
   spec.homepage      = 'https://github.com/mulev/alexa-ruby'
   spec.license       = 'MIT'
-  spec.files         = Dir['[A-Z]*'] + Dir['lib/**/*'] + Dir['tests/**'] + Dir['bin/**']
+  spec.files         = Dir['[A-Z]*'] + Dir['lib/**/*'] + Dir['spec/**'] + Dir['bin/**']
   spec.files.reject!   { |fn| fn.include?('.gem') }
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
@@ -21,6 +21,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'bundler', '>= 1.6.9'
   spec.add_runtime_dependency 'rake'
   spec.add_runtime_dependency 'oj', '~> 3.0'
-  spec.add_development_dependency 'rspec', '~> 3.2', '>= 3.2.0'
-  spec.add_development_dependency 'rspec-mocks', '~> 3.2', '>= 3.2.0'
+  spec.add_development_dependency 'minitest', '~> 5.10', '>= 5.10.2'
+  spec.add_development_dependency 'minitest-reporters', '~> 1.1', '>= 1.1.14'
+  spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0.0'
 end

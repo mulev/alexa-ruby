@@ -1,25 +1,80 @@
 module AlexaRuby
   # Class for Amazon Alexa app cards
   class Card
-    attr_accessor :obj
+    attr_reader :obj
 
     # Initialize new card object
-    def initialize
+    #
+    # @param params [Hash] card parameters:
+    #   type [String] card type, can be "Simple", "Standard" or "LinkAccount"
+    #   title [String] card title
+    #   content [String] card content (line breaks must be already included)
+    #   small_image_url [String] an URL for small card image
+    #   large_image_url [String] an URL for large card image
+    # @return [Hash] ready to use card object
+    # @raise [ArgumentError] if card type is unknown
+    def initialize(params)
       @obj = {}
+      @obj[:type] = params[:type] || 'Simple'
+      raise ArgumentError, 'Unknown card type' unless valid_type?
+      @params = params
+      build
+    end
+
+    private
+
+    # Check if card type is valid
+    #
+    # @return [Boolean]
+    def valid_type?
+      %w[Simple Standard LinkAccount].include? @obj[:type]
     end
 
     # Build card object
     #
-    # @param opts [Hash] card parameters:
-    #                     - type - card type
-    #                     - title - card title
-    #                     - subtitle - card subtitle
-    #                     - content - card body content
-    def build(opts)
-      @obj[:type] = opts[:type]
-      @obj[:title] = opts[:title] unless opts[:title].nil?
-      @obj[:subtitle] = opts[:subtitle] unless opts[:subtitle].nil?
-      @obj[:content] = opts[:content] unless opts[:content].nil?
+    # @return [Hash] ready to use card object
+    def build
+      return if @obj[:type] == 'LinkAccount'
+      add_title
+      add_content unless @params[:content].nil?
+      return unless @obj[:type] == 'Standard'
+      return if @params[:small_image_url].nil? &&
+                @params[:large_image_url].nil?
+      add_images
+    end
+
+    # Add card title to object
+    #
+    # @raise [ArgumentError] if not title found
+    def add_title
+      raise ArgumentError, 'Card need a title' if @params[:title].nil?
+      @obj[:title] = @params[:title]
+    end
+
+    # Add content to card body.
+    # Content must be already prepared and contain needed line breaks.
+    # \r\n or \n can be used for line breaks
+    def add_content
+      type =
+        case @obj[:type]
+        when 'Simple'
+          :content
+        when 'Standard'
+          :text
+        end
+      @obj[type] = @params[:content]
+    end
+
+    # Add images to card
+    def add_images
+      @obj[:image] = {}
+
+      if @params[:small_image_url]
+        @obj[:image][:smallImageUrl] = @params[:small_image_url]
+      end
+
+      return unless @params[:large_image_url]
+      @obj[:image][:largeImageUrl] = @params[:large_image_url]
     end
   end
 end

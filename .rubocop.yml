@@ -2,3 +2,5 @@ AllCops:
   Exclude:
     - 'spec/**/*'
     - 'alexa_ruby.gemspec'
+    - 'Rakefile'
+    - 'Gemfile'

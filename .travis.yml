@@ -3,7 +3,7 @@ rvm:
   - 2.1.0
   - 2.2.0
   - 2.3.4
-script: bundle exec rspec --color --format=documentation
+script: rake test
 notifications:
   slack:
     secure: ryPpwT66EmmHd+oY/UYOVj9q3sjnL2a3/xtO0bl+zqu9xjyV9TNVnWWZpcRjxgR5rezkYGUlCMeGehX/R9DSGUoQnvvkNuySW5He96TKxZoJGIB3tuQayQG1BVvfS8qOXqw5t49Xk53ZIqE3PDeI3UGYqfXXlSDz47+gt/cNVFyo+Hl7Yzu3uOQ3a8IAybRhk7fP7dLlLaffoCZgILh61xUeNJQf0RVbb7ii5OUVrLfr9VZ/oyrHN/lKxM85YLY65JtP39gEXdd4HY4QlvMfctLceko6+Z4xnM7sLIW3bwi6zoak5gLbfps92t8roNzvEZPy8pFa1MjI7weRj2s3W9BFQRXascOwnOIubCJReUpb6ucM6FlbAYwBHvJaOtoIjqVQ//csyW7cBw2vE9yXpboSoS+WGeozAkChXbhPn2nN3wrki3f1c+te3aLZ2urVtdgcDAek2IDJnj/Mg9dmaIB0jSsDLBjvtTg/hORcFGfExBL5SG78KzoG4C+CHNZT8sl5/kZShcV0BRTguXg0jV1oBwEUDofogaG5yaguhMzwZXtBnXzC0fAOKUj3OIqgBQ4mXfyjxWVbPpo4qdYprPUhjiL3x+gcHm/toEF06AYZIIvfMpB3dWvN88sze3PoEyBpOZxiDHPABcRqGr1qgYRAG2enbScODhUFrlNT7Uc=
