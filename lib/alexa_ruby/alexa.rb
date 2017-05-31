@@ -21,7 +21,7 @@ module AlexaRuby
     #
     # @return [Boolean]
     def invalid_request?
-      @req[:version].nil? || @req[:context].nil? || @req[:request].nil?
+      @req[:version].nil? || @req[:request].nil?
     end
 
     # Request structure isn't valid, raise exception

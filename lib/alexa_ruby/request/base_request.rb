@@ -10,7 +10,7 @@ module AlexaRuby
       @req = request
       @version = @req[:version]
       @session = parse_session unless @type == :audio_player
-      @context = parse_context
+      @context = parse_context unless @req[:context].nil?
       @id = nil
       @timestamp = nil
       @locale = nil
