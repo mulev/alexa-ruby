@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "sessionAttributes": {},
+  "response": {
+    "shouldEndSession": true,
+    "outputSpeech": {
+      "type": "PlainText",
+      "text": "Test"
+    }
+  }
+}

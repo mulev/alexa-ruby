@@ -1,134 +1,201 @@
-require 'rspec'
-require 'alexa_ruby/response'
+require_relative 'spec_helper'
 
-describe 'Builds appropriate response objects' do
-
-  #TODO: Do a :before with the Response object creation
-
-  it 'should create valid session responses' do
-    # Pair values.
-    response = AlexaRuby::Response.new
-    response.add_session_attribute('new', false)
-    response.add_session_attribute('sessionId', 'amzn1.echo-api.session.abeee1a7-aee0-41e6-8192-e6faaed9f5ef')
-    session = response.build_session
-    expect(session).to include(:sessionAttributes)
-    expect(session[:sessionAttributes]).to include(:new)
-    expect(session[:sessionAttributes]).to include(:sessionId)
-
-    # Empty.
-    response = AlexaRuby::Response.new
-    session = response.build_session
-    expect(session).to include(:sessionAttributes)
-    expect(session[:sessionAttributes]).to be_empty
+describe 'Build response to Amazon Alexa service' do
+  before do
+    @req_path = 'spec/fixtures/request'
+    @resp_path = 'spec/fixtures/response'
   end
 
-  # TODO: Add cards.
-  it 'should create a valid Alexa say response object' do
-    response = AlexaRuby::Response.new
-    response.add_speech('Testing Alexa Rubykit!')
-    response_object = response.build_response_object
-    expect(response_object).to include(:outputSpeech)
-    expect(response_object[:outputSpeech][:type]).to include('PlainText')
-    expect(response_object[:outputSpeech][:text]).to include('Testing Alexa Rubykit!')
+  describe 'General response handling' do
+    before do
+      @json = File.read("#{@req_path}/launch_request.json")
+      @alexa = AlexaRuby.new(@json)
+    end
 
-    # The say_response command should create the same object.
-    response_say = AlexaRuby::Response.new
-    response_say_object = response_say.say_response('Testing Alexa Rubykit!')
-    expect(response_say_object).to eq(response_object)
-
-    # End session should be true if we didn't specify it.
-    expect(response_object[:shouldEndSession]).to eq(true)
-    response_object = response.build_response_object(false)
-    # And to be false if we tell it to continue the session
-    expect(response_object[:shouldEndSession]).to eq(false)
-    # say_response should now be NOT equal thanks to endsession.
-    expect(response_say_object).not_to eq(response_object)
+    it 'should build a Response object for valid JSON' do
+      @alexa.response.wont_be_nil
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:version].wont_be_nil
+      resp[:response][:shouldEndSession].must_equal true
+    end
   end
 
-  it 'should create a valid SSML Alexa say response object' do
-    response = AlexaRuby::Response.new
-    response.add_speech('<speak>Testing SSML Alexa Rubykit support!</speak>',true)
-    response_object = response.build_response_object
-    expect(response_object).to include(:outputSpeech)
-    expect(response_object[:outputSpeech][:type]).to include('SSML')
-    expect(response_object[:outputSpeech][:ssml]).to include('<speak>Testing SSML Alexa Rubykit support!</speak>')
+  describe 'Session parameters management' do
+    before do
+      @json = File.read("#{@req_path}/launch_request.json")
+      @alexa = AlexaRuby.new(@json)
+    end
 
-    # The say_response command should create the same object.
-    response_say = AlexaRuby::Response.new
-    response_say_object = response_say.say_response('<speak>Testing SSML Alexa Rubykit support!</speak>',true,true)
-    expect(response_say_object).to eq(response_object)
+    it 'should add one session attribute correctly' do
+      @alexa.response.add_session_attribute(:id, 'djsdhdsjhdsjhdsjh')
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:sessionAttributes][:id].must_equal 'djsdhdsjhdsjhdsjh'
+    end
 
-    # End session should be true if we didn't specify it.
-    expect(response_object[:shouldEndSession]).to eq(true)
-    response_object = response.build_response_object(false)
-    # And to be false if we tell it to continue the session
-    expect(response_object[:shouldEndSession]).to eq(false)
-    # say_response should now be NOT equal thanks to endsession.
-    expect(response_say_object).not_to eq(response_object)
+    it 'should add pack of session attributes correctly' do
+      @alexa.response.add_session_attributes(
+        id: 'djsdhdsjhdsjhdsjh',
+        test: 'test'
+      )
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:sessionAttributes][:id].must_equal 'djsdhdsjhdsjhdsjh'
+      resp[:sessionAttributes][:test].must_equal 'test'
+    end
+
+    it 'should merge pack of session attributes correctly' do
+      @alexa.response.add_session_attributes(
+        id: 'djsdhdsjhdsjhdsjh',
+        test: 'test'
+      )
+      @alexa.response.merge_session_attributes(token: '7783y3h43hg4ghh')
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:sessionAttributes][:id].must_equal 'djsdhdsjhdsjhdsjh'
+      resp[:sessionAttributes][:test].must_equal 'test'
+      resp[:sessionAttributes][:token].must_equal '7783y3h43hg4ghh'
+    end
+
+    it 'should raise ArgumentError if duplicate attribute found' do
+      @alexa.response.add_session_attribute(:id, 'djsdhdsjhdsjhdsjh')
+      err = proc {
+        @alexa.response.add_session_attribute(:id, '833hj33jh3hj')
+      }.must_raise ArgumentError
+      err.message.must_equal 'Duplicate session attributes not allowed'
+    end
+
+    it 'should raise ArgumentError if attributes pack isn\'t a Hash' do
+      err = proc {
+        @alexa.response.add_session_attributes('Test')
+      }.must_raise ArgumentError
+      err.message.must_equal 'Attributes must be a Hash'
+    end
   end
 
-  it 'should create a valid SSML Alexa say response object when ssml lacks speak tags' do
-    response = AlexaRuby::Response.new
-    response.add_speech('Testing SSML Alexa Rubykit support!',true)
-    response_object = response.build_response_object
-    expect(response_object).to include(:outputSpeech)
-    expect(response_object[:outputSpeech][:type]).to include('SSML')
-    expect(response_object[:outputSpeech][:ssml]).to include('<speak>')
-    expect(response_object[:outputSpeech][:ssml]).to include('</speak>')
-    expect(response_object[:outputSpeech][:ssml]).to include('<speak>Testing SSML Alexa Rubykit support!</speak>')
+  describe 'Cards management' do
+    before do
+      @json = File.read("#{@req_path}/launch_request.json")
+      @card = Oj.load(
+        File.read("#{@resp_path}/sample_card.json"),
+        symbol_keys: true
+      )
+      @alexa = AlexaRuby.new(@json)
+    end
+
+    it 'should add card to response' do
+      @alexa.response.add_card(@card)
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:response][:card][:type].must_equal 'Simple'
+      resp[:response][:card][:title].must_equal 'title'
+      resp[:response][:card][:content].must_equal 'text'
+    end
+
+    it 'should add "text" and "image" nodes if card type is Standard' do
+      @card[:type] = 'Standard'
+      @alexa.response.add_card(@card)
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      small_url = 'https://test.ru/example_small.jpg'
+      large_url = 'https://test.ru/example_large.jpg'
+      resp[:response][:card][:type].must_equal 'Standard'
+      resp[:response][:card][:text].must_equal 'text'
+      resp[:response][:card][:image][:smallImageUrl].must_equal small_url
+      resp[:response][:card][:image][:largeImageUrl].must_equal large_url
+    end
+
+    it 'should raise ArgumentError if no title given' do
+      @card[:title] = nil
+      err = proc { @alexa.response.add_card(@card) }.must_raise ArgumentError
+      err.message.must_equal 'Card need a title'
+    end
+
+    it 'should raise ArgumentError if card type unknown' do
+      @card[:type] = 'Test'
+      err = proc { @alexa.response.add_card(@card) }.must_raise ArgumentError
+      err.message.must_equal 'Unknown card type'
+    end
   end
 
-  it 'should create a valid minimum response (body)' do
-    # Every response needs a version and a "response object", sessionAttributes is optional.
-    # Response Object needs a endsession at a minimum, which we default to true.
-    response = AlexaRuby::Response.new
-    response.build_response_object
-    response_json = response.build_response
-    sample_json = Oj.to_json(Oj.load(File.read('fixtures/response-min.json')))
-    expect(response_json).to eq(sample_json)
+  describe 'Audio directives management' do
+    before do
+      @json = File.read("#{@req_path}/launch_request.json")
+      @audio = Oj.load(
+        File.read("#{@resp_path}/sample_audio.json"),
+        symbol_keys: true
+      )
+      @alexa = AlexaRuby.new(@json)
+    end
+
+    it 'should add AudioPlayer.Play directive' do
+      @alexa.response.add_audio_player_directive(:start, @audio)
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      directive = resp[:response][:directives][0]
+      directive[:type].must_equal 'AudioPlayer.Play'
+      directive[:playBehavior].must_equal 'REPLACE_ALL'
+      stream = directive[:audioItem][:stream]
+      stream[:url].must_equal @audio[:url]
+      stream[:token].must_equal @audio[:token]
+      stream[:offsetInMilliseconds].must_equal @audio[:offset]
+    end
+
+    it 'should add AudioPlayer.Stop directive' do
+      @alexa.response.add_audio_player_directive(:stop)
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:response][:directives][0][:type].must_equal 'AudioPlayer.Stop'
+    end
   end
 
-  it 'should create a valid card from a hash' do
-    response = AlexaRuby::Response.new
-    response.add_card( { :title => 'Ruby Run', :subtitle => 'Ruby Running Ready!' } )
-    response_json = response.build_response_object
-    sample_json = Oj.to_json(Oj.load(File.read('fixtures/sample-card.json')))
-    expect(Oj.to_json(response_json)).to eq(sample_json)
-  end
+  describe 'Speech management' do
+    before do
+      @json = File.read("#{@req_path}/launch_request.json")
+      @alexa = AlexaRuby.new(@json)
+    end
 
-  it 'should create an empty valid card with a response object.' do
-    response = AlexaRuby::Response.new
-    response.add_card
-    response_json = response.build_response_object
-    sample_json = Oj.to_json(Oj.load(File.read('fixtures/card-min.json')))
-    expect(Oj.to_json(response_json)).to eq(sample_json)
-  end
+    it 'should add plain text output to response' do
+      @alexa.response.tell('Test')
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:response][:outputSpeech][:type].must_equal 'PlainText'
+      resp[:response][:outputSpeech][:text].must_equal 'Test'
+      resp[:response][:outputSpeech][:ssml].must_be_nil
+    end
 
-  it 'should create a valid response with some attributes' do
-    response = AlexaRuby::Response.new
-    response.add_session_attribute('new', false)
-    response.add_session_attribute('sessionId', 'amzn-xxx-yyy-zzz')
-    response.build_response_object
-    response_json = response.build_response
-    sample_json = Oj.to_json(Oj.load(File.read('fixtures/response-sessionAtt.json')))
-    expect(response_json).to eq(sample_json)
-  end
+    it 'should add SSML output to response' do
+      @alexa.response.tell('Test', nil, true)
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:response][:outputSpeech][:type].must_equal 'SSML'
+      resp[:response][:outputSpeech][:ssml].must_equal '<speak>Test</speak>'
+      resp[:response][:outputSpeech][:text].must_be_nil
+    end
 
-  it 'should create a valid response with a start audio stream directive' do
-    response = AlexaRuby::Response.new
-    response.add_audio_player_directive(:start, { url: 'https://test.ru/url.mp3', token: 'token', offset: 100 })
-    response.build_response_object
-    response_json = response.build_response
-    sample_json = Oj.to_json(Oj.load(File.read('fixtures/response-sessionAudio.json')))
-    expect(response_json).to eq(sample_json)
-  end
+    it 'should add output with repromt' do
+      @alexa.response.tell('Test', 'One more test')
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:response][:outputSpeech][:type].must_equal 'PlainText'
+      resp[:response][:outputSpeech][:text].must_equal 'Test'
+      resp[:response][:outputSpeech][:ssml].must_be_nil
+      repromt = resp[:response][:reprompt][:outputSpeech]
+      repromt[:type].must_equal 'PlainText'
+      repromt[:text].must_equal 'One more test'
+      repromt[:ssml].must_be_nil
+    end
 
-  it 'should create a valid response with a stop audio stream directive' do
-    response = AlexaRuby::Response.new
-    response.add_audio_player_directive(:stop)
-    response.build_response_object
-    response_json = response.build_response
-    sample_json = Oj.to_json(Oj.load(File.read('fixtures/response-sessionStopAudio.json')))
-    expect(response_json).to eq(sample_json)
+    it 'should add output speech and return JSON' do
+      sample = Oj.to_json(
+        Oj.load(File.read("#{@resp_path}/sample_response.json"))
+      )
+      @alexa.response.tell!('Test').must_equal sample
+    end
+
+    it 'should add output speech without closing session' do
+      @alexa.response.ask('Test')
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp[:response][:shouldEndSession].must_equal false
+    end
+
+    it 'should add output speech without closing session and return JSON' do
+      sample = Oj.load(
+        File.read("#{@resp_path}/sample_response.json"),
+        symbol_keys: true
+      )
+      sample[:response][:shouldEndSession] = false
+      @alexa.response.ask!('Test').must_equal Oj.to_json(sample)
+    end
   end
 end

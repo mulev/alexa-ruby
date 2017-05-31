@@ -1,176 +1,204 @@
-require 'alexa_ruby/response/audio_player'
-require 'alexa_ruby/response/card'
-
 module AlexaRuby
-  # Class implements response for Amazon Alexa API
+  # Response for Amazon Alexa service request
   class Response
-    attr_accessor :version, :session, :response_object, :session_attributes,
-                  :speech, :reprompt, :response, :card
-
-    # Initialize new response and set response version
+    # Initialize new response
     #
-    # @param version [String] response version
-    def initialize(version = '1.0')
-      @session_attributes = {}
-      @version = version
-      @directives = []
+    # @param request_type [Symbol] AlexaRuby::Request type
+    # @param version [String] Amazon Alexa SDK version
+    def initialize(request_type, version = '1.0')
+      @req_type = request_type
+      @resp = {
+        version: version,
+        sessionAttributes: {},
+        response: { shouldEndSession: true }
+      }
     end
 
-    # Adds a key => value pair to the session object
+    # Add one session attribute
     #
-    # @param key [String] attribute key
+    # @param key [String] atrribute key
     # @param value [String] attribute value
-    def add_session_attribute(key, value)
-      @session_attributes[key.to_sym] = value
+    # @raise [ArgumentError] if session key is already added and
+    #   rewrite is set to false
+    def add_session_attribute(key, value, rewrite = false)
+      unless rewrite
+        if @resp[:sessionAttributes].key?(key)
+          raise ArgumentError, 'Duplicate session attributes not allowed'
+        end
+      end
+      @resp[:sessionAttributes][key] = value
     end
 
-    # Add output speech to response object.
-    # Speech can be plain text or SSML text, default type is plain text
+    # Add pack of session attributes and overwrite all existing ones
     #
-    # @param speech_text [String] output speech
-    # @param ssml [Boolean] is it an SSML speech or not
-    def add_speech(speech_text, ssml = false)
-      @speech =
-        if ssml
-          { type: 'SSML', ssml: check_ssml(speech_text) }
-        else
-          { type: 'PlainText', text: speech_text }
-        end
-      @speech
+    # @param attributes [Hash] pack of session attributes
+    # @raise [ArgumentError] if given paramter is not a Hash object
+    def add_session_attributes(attributes)
+      unless attributes.is_a? Hash
+        raise ArgumentError, 'Attributes must be a Hash'
+      end
+      session_attributes(attributes, false)
+    end
+
+    # Add pack of session attributes to existing ones
+    #
+    # @param attributes [Hash] pack of session attributes
+    # @raise [ArgumentError] if given paramter is not a Hash object
+    def merge_session_attributes(attributes)
+      unless attributes.is_a? Hash
+        raise ArgumentError, 'Attributes must be a Hash'
+      end
+      session_attributes(attributes, true)
+    end
+
+    # Add card to response object
+    #
+    # @param params [Hash] card parameters:
+    #   type [String] card type, can be "Simple", "Standard" or "LinkAccount"
+    #   title [String] card title
+    #   content [String] card content (line breaks must be already included)
+    #   small_image_url [String] an URL for small card image
+    #   large_image_url [String] an URL for large card image
+    # @raise [NoMethodError] if card is not allowed
+    def add_card(params = {})
+      card_exception unless %i[launch intent].include? @req_type
+      card = Card.new(params)
+      @resp[:response][:card] = card.obj
     end
 
     # Add AudioPlayer directive
     #
     # @param directive [String] audio player directive type,
     #                           can be :start or :stop
-    # @param opts [Hash] optional request parameters
-    def add_audio_player_directive(directive, opts = {})
+    # @param params [Hash] optional request parameters:
+    #   url [String] streaming URL
+    #   token [String] streaming service token
+    #   offset [Integer] playback offset
+    def add_audio_player_directive(directive, params = {})
       player = AudioPlayer.new
-      @directives = []
-      case directive.to_sym
-      when :start
-        player.build_play_directive(opts)
-      when :stop
-        player.build_stop_directive
-      end
-      @directives << player.directive
-    end
-
-    # Add reprompt to outputSpeech node
-    #
-    # @param speech_text [String] output speech
-    # @param ssml [Boolean] is it an SSML speech or not
-    def add_reprompt(speech_text, ssml = false)
-      @reprompt =
-        if ssml
-          { outputSpeech: { type: 'SSML', ssml: check_ssml(speech_text) } }
-        else
-          { outputSpeech: { type: 'PlainText', text: speech_text } }
+      @resp[:response][:directives] = [
+        case directive.to_sym
+        when :start
+          player.play_directive(params)
+        when :stop
+          player.stop_directive
         end
-      @reprompt
+      ]
     end
 
-    # Add card that will be shown in Amazon Alexa app on user smartphone/tablet
+    # Return JSON version of current response state
     #
-    # @param opts [Hash] hash with card parameters
-    # @return [Hash] card object
-    def add_card(opts = {})
-      opts[:type] = 'Simple' if opts[:type].nil?
-      card = Card.new
-      card.build(opts)
-      @card = card.obj
+    # @return [JSON] response object
+    def json
+      Oj.to_json(@resp)
     end
 
-    # Adds a speech to the object, also returns a outputspeech object
+    # Tell something to Alexa user and close conversation.
+    # Method will only add a given speech to response object
     #
-    # @param speech [String] output speech
-    # @param end_session [Boolean] is it a final response, or not
+    # @param speech [Sring] output speech
+    # @param reprompt_speech [String] output speech if user remains idle
     # @param ssml [Boolean] is it an SSML speech or not
-    def say_response(speech, end_session = true, ssml = false)
-      output_speech = add_speech(speech, ssml)
-      { outputSpeech: output_speech, shouldEndSession: end_session }
-    end
-
-    # Incorporates reprompt in the SDK 2015-05
-    #
-    # @param speech [String] output speech
-    # @param reprompt_speech [String] output repromt speech
-    # @param end_session [Boolean] is it a final response, or not
-    # @param speech_ssml [Boolean] is it an SSML speech or not
-    # @param reprompt_ssml [Boolean] is it an SSML repromt speech or not
-    def say_response_with_reprompt(speech, reprompt_speech, end_session = true,
-                                   speech_ssml = false, reprompt_ssml = false)
-      output_speech = add_speech(speech, speech_ssml)
-      reprompt_speech = add_reprompt(reprompt_speech, reprompt_ssml)
-      {
-        outputSpeech: output_speech,
-        reprompt: reprompt_speech,
-        shouldEndSession: end_session
-      }
-    end
-
-    # Creates a session object. We pretty much only use this in testing.
-    # If it's empty assume user doesn't need session attributes
-    #
-    # @return [Hash] user session parameters
-    def build_session
-      @session_attributes = {} if @session_attributes.nil?
-      @session = { sessionAttributes: @session_attributes }
-      @session
-    end
-
-    # The response object (with outputspeech, cards and session end)
-    # Should rename this, but Amazon picked their names.
-    # The only mandatory field is end_session which we default to true.
-    #
-    # @param session_end [Boolean] is it a final response, or not
-    # @return [Hash] response parameters
-    def build_response_object(session_end = true)
-      @response = {}
-      @response[:outputSpeech] = @speech unless @speech.nil?
-      @response[:directives] = @directives unless @directives.empty?
-      @response[:card] = @card unless @card.nil?
-      @response[:reprompt] = @reprompt unless session_end && @reprompt.nil?
-      @response[:shouldEndSession] = session_end
-      @response
-    end
-
-    # Builds a response.
-    # Takes the version, response, should_end_session variables
-    # and builds a JSON object
-    #
-    # @param session_end [Boolean] is it a final response, or not
-    # @return [JSON] json response for Amazon Alexa
-    def build_response(session_end = true)
-      response_object = build_response_object(session_end)
-      response = {}
-      response[:version] = @version
-      unless @session_attributes.empty?
-        response[:sessionAttributes] = @session_attributes
+    def tell(speech, reprompt_speech = nil, ssml = false)
+      obj = { outputSpeech: build_speech(speech, ssml) }
+      if reprompt_speech
+        obj[:reprompt] = { outputSpeech: build_speech(reprompt_speech, ssml) }
       end
-      response[:response] = response_object
-      Oj.to_json(response)
+      @resp[:response].merge!(obj)
     end
 
-    # Outputs the version, session object and the response object.
+    # Tell something to Alexa user and close conversation.
+    # Method will add given sppech to response object and
+    # immediately return its JSON implementation
     #
-    # @return [String] version, session object and the response object
-    def to_s
-      "Version => #{@version}, SessionObj => #{@session}, " \
-        "Response => #{@response}"
+    # @param speech [Sring] output speech
+    # @param reprompt_speech [String] output speech if user remains idle
+    # @param ssml [Boolean] is it an SSML speech or not
+    # @return [JSON] ready to use response object
+    def tell!(speech, reprompt_speech = nil, ssml = false)
+      obj = { outputSpeech: build_speech(speech, ssml) }
+      if reprompt_speech
+        obj[:reprompt][:outputSpeech] = build_speech(reprompt_speech, ssml)
+      end
+      @resp[:response].merge!(obj)
+      json
+    end
+
+    # Ask something from user and wait for further information.
+    # Method will only add given sppech to response object and
+    # set "shouldEndSession" parameter to false
+    #
+    # @param speech [Sring] output speech
+    # @param reprompt_speech [String] output speech if user remains idle
+    # @param ssml [Boolean] is it an SSML speech or not
+    def ask(speech, reprompt_speech = nil, ssml = false)
+      @resp[:response][:shouldEndSession] = false
+      tell(speech, reprompt_speech, ssml)
+    end
+
+    # Ask something from user and wait for further information.
+    # Method will only add given sppech to response object,
+    # set "shouldEndSession" parameter to false and
+    # immediately return response JSON implementation
+    #
+    # @param speech [Sring] output speech
+    # @param reprompt_speech [String] output speech if user remains idle
+    # @param ssml [Boolean] is it an SSML speech or not
+    # @return [JSON] ready to use response object
+    def ask!(speech, reprompt_speech = nil, ssml = false)
+      @resp[:response][:shouldEndSession] = false
+      tell!(speech, reprompt_speech, ssml)
     end
 
     private
 
-    # Check and fix SSML speech
+    # Add pack of session attributes.
+    # By default all existing session attributes would be overwritten
     #
-    # @param ssml [String] SSML string
-    # @return [String] valid SSML string
-    def check_ssml(ssml)
-      open_tag = ssml.strip[0..6]
-      close_tag = ssml.strip[-8..1]
-      ssml = open_tag == '<speak>' ? ssml : "<speak>#{ssml}"
-      close_tag == '</speak>' ? ssml : "#{ssml}</speak>"
+    # @param attributes [Hash] pack of session attributes
+    # @param merge [Boolean] merge attributes with existing ones?
+    def session_attributes(attributes, merge)
+      if merge
+        attributes.each { |k, v| add_session_attribute(k, v, true) }
+      else
+        @resp[:sessionAttributes] = {}
+        attributes.each { |k, v| add_session_attribute(k, v, false) }
+      end
+    end
+
+    # Build speech object
+    #
+    # @param speech [Sring] output speech
+    # @param ssml [Boolean] is it an SSML speech or not
+    # @return [Hash] speech object
+    def build_speech(speech, ssml)
+      obj = {}
+      obj[:type] = ssml ? 'SSML' : 'PlainText'
+      if ssml
+        obj[:ssml] = fix_ssml(speech)
+      else
+        obj[:text] = speech
+      end
+      obj
+    end
+
+    # Forced fix of SSML speech - manually check and fix open and close tags
+    #
+    # @param text [String] SSML response speech
+    # @return [String] fixed SSML speech
+    def fix_ssml(text)
+      open_tag = text.strip[0..6]
+      close_tag = text.strip[-8..1]
+      text = open_tag == '<speak>' ? text : "<speak>#{text}"
+      close_tag == '</speak>' ? text : "#{text}</speak>"
+    end
+
+    # Raise card exception
+    #
+    # @raise [NoMethodError] if card is not allowed
+    def card_exception
+      raise NoMethodError, 'Card can only be included in response ' \
+                            'to a "LaunchRequest" or "IntentRequest"'
     end
   end
 end

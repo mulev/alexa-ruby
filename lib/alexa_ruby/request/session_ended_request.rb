@@ -1,23 +1,23 @@
 # Session end request class.
 module AlexaRuby
-  # Class for Amazon "SessionEndedRequest" request type
-  class SessionEndedRequest < Request
-    attr_accessor :reason
-
+  # Amazon "SessionEndedRequest" request type
+  class SessionEndedRequest < BaseRequest
     # Initialize new SessionEndedRequest
     #
-    # @param json [JSON] valid JSON request from Amazon
-    def initialize(json)
+    # @param request [Hash] valid request from Amazon Alexa service
+    def initialize(request)
       @type = :session_ended
-      @reason = json[:request][:reason]
       super
+      finalize_session
     end
 
-    # Ouputs the request_id and the reason of session end
-    #
-    # @return [String] request_id and the reason of session end
-    def to_s
-      "Session Ended for requestID: #{request_id} with reason #{reason}"
+    private
+
+    # Set final session params
+    def finalize_session
+      @session.state = :ended
+      @session.end_reason = @req[:request][:reason]
+      @session.error = @req[:request][:error] unless @req[:request][:error].nil?
     end
   end
 end
