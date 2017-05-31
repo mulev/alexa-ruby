@@ -67,11 +67,13 @@ Gem can be used with any framework - Rails, Sinatra, Cuba, Roda, or any other th
 
 ## Testing
 
-Run all tests with
+Run all tests with:
 
 ```bash
 $ rake test
 ```
+
+Please, feel free to [open an issue](https://github.com/mulev/alexa-ruby/issues/new) in case of any bugs.
 
 ## Contributing
 
