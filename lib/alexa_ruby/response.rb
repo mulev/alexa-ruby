@@ -118,7 +118,7 @@ module AlexaRuby
     def tell!(speech, reprompt_speech = nil, ssml = false)
       obj = { outputSpeech: build_speech(speech, ssml) }
       if reprompt_speech
-        obj[:reprompt][:outputSpeech] = build_speech(reprompt_speech, ssml)
+        obj[:reprompt] = { outputSpeech: build_speech(reprompt_speech, ssml) }
       end
       @resp[:response].merge!(obj)
       json
