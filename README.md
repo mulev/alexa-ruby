@@ -3,7 +3,6 @@
 [![Gem Version](https://badge.fury.io/rb/alexa_ruby.svg)](https://badge.fury.io/rb/alexa_ruby)
 [![Build Status](https://travis-ci.org/mulev/alexa-ruby.svg?branch=master)](https://travis-ci.org/mulev/alexa-ruby)
 [![Code Climate](https://codeclimate.com/github/mulev/alexa-ruby/badges/gpa.svg)](https://codeclimate.com/github/mulev/alexa-ruby)
-[![Test Coverage](https://codeclimate.com/github/mulev/alexa-ruby/badges/coverage.svg)](https://codeclimate.com/github/mulev/alexa-ruby/coverage)
 
 Originally forked from [damianFC's AlexaRubykit](https://github.com/damianFC/alexa-rubykit), this gem implements a convenient back-end service for interaction with Amazon Alexa API.
 
@@ -73,3 +72,18 @@ Run all tests with
 ```bash
 $ rake test
 ```
+
+## Contributing
+
+You are always welcome to open an issue with some feature request or bug report. Also you can add new features by yourself. To do so, please, follow that steps:
+
+1. Fork master branch of this repo
+2. Add a new feature branch in your forked repo and write code
+3. Write tests
+4. Add pull request from your branch to [alexa_ruby develop branch](https://github.com/mulev/alexa-ruby/tree/develop)
+
+All development is made only in develop branch before being merged to master.
+
+## License
+
+AlexaRuby is released under [MIT license](https://github.com/mulev/alexa-ruby/blob/master/LICENSE).
