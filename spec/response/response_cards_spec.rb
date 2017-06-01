@@ -24,6 +24,13 @@ describe 'AlexaRuby::Response' do
       resp[:response][:card][:content].must_equal 'text'
     end
 
+    it 'should raise ArgumentError if card not allowed in response' do
+      alexa = AlexaRuby.new(File.read("#{@req_path}/audio_player_request.json"))
+      err = proc { alexa.response.add_card(@card) }.must_raise ArgumentError
+      err.message.must_equal 'Card can only be included in response ' \
+                              'to a "LaunchRequest" or "IntentRequest"'
+    end
+
     it 'should add "text" and "image" nodes if card type is Standard' do
       @card[:type] = 'Standard'
       @alexa.response.add_card(@card)

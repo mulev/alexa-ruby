@@ -41,10 +41,17 @@ describe 'AlexaRuby::Response' do
     end
 
     it 'should add output speech and return JSON' do
-      sample = Oj.to_json(
-        Oj.load(File.read("#{@resp_path}/sample_response.json"))
+      sample = Oj.load(
+        File.read("#{@resp_path}/sample_response.json"),
+        symbol_keys: true
       )
-      @alexa.response.tell!('Test').must_equal sample
+      sample[:response][:reprompt] = {
+        outputSpeech: {
+          type: 'PlainText',
+          text: 'Test'
+        }
+      }
+      @alexa.response.tell!('Test', 'Test').must_equal Oj.to_json(sample)
     end
 
     it 'should add output speech without closing session' do
