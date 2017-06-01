@@ -8,8 +8,13 @@ module AlexaRuby
     #   token [String] streaming service token
     #   offset [Integer] playback offset
     # @return [Hash] AudioPlayer.Play directive
+    # @raise [ArgumentError] if audio URL isn't valid
     def play_directive(params)
       url = params[:url]
+      if invalid_url?(url)
+        raise ArgumentError, 'Audio URL must be a valid ' \
+                              'SSL-enabled (HTTPS) endpoint'
+      end
       token = params[:token] || SecureRandom.uuid
       offset = params[:offset] || 0
       build_directive('AudioPlayer.Play', url, token, offset)
@@ -39,6 +44,14 @@ module AlexaRuby
       directive[:audioItem][:stream][:token] = token
       directive[:audioItem][:stream][:offsetInMilliseconds] = offset
       directive
+    end
+
+    # Check if given URL isn't an SSL-enabled endpoint
+    #
+    # @param url [String] some URL
+    # @return [Boolean]
+    def invalid_url?(url)
+      !URI.parse(url).scheme == 'https'
     end
   end
 end
