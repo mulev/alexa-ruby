@@ -38,33 +38,210 @@ $ gem install alexa_ruby
 ## Usage
 
 Gem provides a possibility to easily handle requests from Amazon Alexa service and build responses to given requests.
-Usage is as easy as:
+
+### Getting started
+
+AlexaRuby usage is quite simple, to start you need to require gem in your ruby file and pass it JSON request from Amazon Alexa service.  
+Here and below all examples will be based on Roda routing tree framework.
 
 ```ruby
+require 'roda'
 require 'alexa_ruby'
 
-alexa = AlexaRuby.new(request) # request is a HTTP request body
-alexa.response.tell!('Ruby is awesome!')
+class App < Roda
+  route do |r|
+    r.post do
+      r.on 'alexa' do
+        alexa = AlexaRuby.new(r.body.read)
+      end
+    end
+  end
+end
 ```
 
-This simple example will return a valid JSON with response to Amazon Alexa service request:
+After initializing new AlexaRuby instance you will have a possibility to access all parameters of the received request:
 
-```json
-{
-  "version": "1.0",
-  "sessionAttributes": {},
-  "response": {
-    "shouldEndSession": true,
-    "outputSpeech": {
-      "type": "PlainText",
-      "text": "Ruby is awesome!"
-    }
-  }
+```ruby
+# All request types
+alexa.request.json                            # given JSON request
+alexa.request.version                         # request version, typically "1.0"
+alexa.request.type                            # request type, can be :launch, :intent, :session_ended or :audio_player
+alexa.request.id                              # request ID
+alexa.request.timestamp                       # request timestamp
+alexa.request.locale                          # request locale
+
+# IntentRequest
+alexa.request.intent_name                     # given intent name
+alexa.request.dialog_state                    # state of dialog with user, can be :started, :in_progress or :completed
+alexa.request.confirmation_status             # user confirmation status, can be :unknown, :confirmed or :denied
+alexa.request.slots                           # array with all slots from intent
+
+# AudioPlayerRequest
+alexa.request.playback_state                  # current playback state
+alexa.request.playback_offset                 # current playback offset in milliseconds
+alexa.request.error_type                      # playback error type
+alexa.request.error_message                   # playback error message explaining error
+alexa.request.error_playback_token            # audio player token of failed playback
+alexa.request.error_player_activity           # audio player activity in moment of failure
+
+# Session parameters
+alexa.request.session.id                      # session ID
+alexa.request.session.attributes              # array with all session attributes
+alexa.request.session.end_reason              # session end reason, can be :user_quit, :processing_error or :user_idle
+alexa.request.session.error                   # hash with session error info
+alexa.request.session.state                   # current session state, can be :new, :old or :ended
+
+# Context parameters
+alexa.request.context.app_id                  # Alexa application ID
+alexa.request.context.api_endpoint            # Alexa API endpoint
+alexa.request.context.user.id                 # skill user ID
+alexa.request.context.user.access_token       # user access token if account linking is enabled and user is authenticated
+alexa.request.context.user.permissions_token  # user permissions token
+alexa.request.context.device.id               # user device ID
+alexa.request.context.device.interfaces       # interfaces, supported by user device
+```
+
+### Building response
+
+To build a response take your freshly initialized `alexa` and start using `alexa.response` methods.
+
+#### Add session attributes
+
+To add one attribute use:
+
+```ruby
+# Add one session attribute
+#
+# @param key [String] atrribute key
+# @param value [String] attribute value
+# @param rewrite [Boolean] rewrite if key already exists?
+# @raise [ArgumentError] if session key is already added and
+#   rewrite is set to false
+alexa.response.add_session_attribute('key', 'value')
+alexa.response.add_session_attribute('key', 'value_2', true) # will rewrite previously set attribute 'key'
+```
+
+You can also add a pack of attributes:
+
+```ruby
+attributes = { key: 'value', key_2: 'value_2' }
+
+# Add pack of session attributes and overwrite all existing ones
+#
+# @param attributes [Hash] pack of session attributes
+# @raise [ArgumentError] if given paramter is not a Hash object
+alexa.response.add_session_attributes(attributes) # will overwrite all existing attributes
+
+# Add pack of session attributes to existing ones
+#
+# @param attributes [Hash] pack of session attributes
+# @raise [ArgumentError] if given paramter is not a Hash object
+alexa.response.merge_session_attributes(attributes) # will add given attributes to existing ones and fail in case of duplicate keys
+```
+
+#### Add card
+
+Supported card types are: Simple and Standard. LinkAccount will be added soon.
+
+```ruby
+card = {
+  type: 'Standard', title: 'Test', content: 'test',
+  small_image_url: 'https://test.ru/example_small.jpg',
+  large_image_url: 'https://test.ru/example_large.jpg'
 }
 
+# Add card to response object
+#
+# @param params [Hash] card parameters:
+#   type [String] card type, can be "Simple", "Standard" or "LinkAccount"
+#   title [String] card title
+#   content [String] card content (line breaks must be already included)
+#   small_image_url [String] an URL for small card image
+#   large_image_url [String] an URL for large card image
+# @raise [ArgumentError] if card is not allowed
+alexa.response.add_card(card)
 ```
 
-Gem can be used with any framework - Rails, Sinatra, Cuba, Roda, or any other that can handle HTTP requests and responses.
+#### Add audio player directive
+
+Supported directives - AudioPlayer.Play and AudioPlayer.Stop.
+
+```ruby
+params = { url: 'https://my-site.com/my-stream', token: 'test', offset: 0 }
+
+# Add AudioPlayer directive
+#
+# @param directive [String] audio player directive type,
+#                           can be :start or :stop
+# @param params [Hash] optional request parameters:
+#   url [String] streaming URL
+#   token [String] streaming service token
+#   offset [Integer] playback offset
+alexa.response.add_audio_player_directive(:start, params) # this one will build AudioPlayer.Play directive
+alexa.response.add_audio_player_directive(:stop) # this one will build AudioPlayer.Stop directive
+```
+
+#### Get current state of response encoded in JSON
+
+```ruby
+alexa.response.json
+```
+
+#### Add output speech to response
+
+Ask user a question and wait for response (session will remain open):
+
+```ruby
+question = 'What can I do for you?'
+
+# Ask something from user and wait for further information.
+# Method will only add given sppech to response object and
+# set "shouldEndSession" parameter to false
+#
+# @param speech [Sring] output speech
+# @param reprompt_speech [String] output speech if user remains idle
+# @param ssml [Boolean] is it an SSML speech or not
+alexa.response.ask(question)                  # will add outputSpeech node
+alexa.response.ask(question, question)        # outputSpeech node and reprompt node
+alexa.response.ask(question, question, true)  # outputSpeech node, reprompt node and both will be converted into SSML
+
+# Ask something from user and wait for further information.
+# Method will only add given sppech to response object,
+# set "shouldEndSession" parameter to false and
+# immediately return response JSON implementation
+#
+# @param speech [Sring] output speech
+# @param reprompt_speech [String] output speech if user remains idle
+# @param ssml [Boolean] is it an SSML speech or not
+# @return [JSON] ready to use response object
+alexa.response.ask!(question)
+```
+
+Tell something to user and end conversation (session will be closed):
+
+```ruby
+speech = 'You are awesome!'
+
+# Tell something to Alexa user and close conversation.
+# Method will only add a given speech to response object
+#
+# @param speech [Sring] output speech
+# @param reprompt_speech [String] output speech if user remains idle
+# @param ssml [Boolean] is it an SSML speech or not
+alexa.response.tell(speech)               # will add outputSpeech node
+alexa.response.tell(speech, speech)       # outputSpeech node and reprompt node
+alexa.response.tell(speech, speech, true) # outputSpeech node, reprompt node and both will be converted into SSML
+
+# Tell something to Alexa user and close conversation.
+# Method will add given sppech to response object and
+# immediately return its JSON implementation
+#
+# @param speech [Sring] output speech
+# @param reprompt_speech [String] output speech if user remains idle
+# @param ssml [Boolean] is it an SSML speech or not
+# @return [JSON] ready to use response object
+alexa.response.tell!(speech)
+```
 
 ## Testing
 

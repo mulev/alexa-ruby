@@ -18,6 +18,7 @@ module AlexaRuby
     #
     # @param key [String] atrribute key
     # @param value [String] attribute value
+    # @param rewrite [Boolean] rewrite if key already exists?
     # @raise [ArgumentError] if session key is already added and
     #   rewrite is set to false
     def add_session_attribute(key, value, rewrite = false)
