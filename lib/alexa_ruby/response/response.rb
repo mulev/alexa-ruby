@@ -59,7 +59,7 @@ module AlexaRuby
     #   content [String] card content (line breaks must be already included)
     #   small_image_url [String] an URL for small card image
     #   large_image_url [String] an URL for large card image
-    # @raise [NoMethodError] if card is not allowed
+    # @raise [ArgumentError] if card is not allowed
     def add_card(params = {})
       card_exception unless %i[launch intent].include? @req_type
       card = Card.new(params)
@@ -195,9 +195,9 @@ module AlexaRuby
 
     # Raise card exception
     #
-    # @raise [NoMethodError] if card is not allowed
+    # @raise [ArgumentError] if card is not allowed
     def card_exception
-      raise NoMethodError, 'Card can only be included in response ' \
+      raise ArgumentError, 'Card can only be included in response ' \
                             'to a "LaunchRequest" or "IntentRequest"'
     end
   end

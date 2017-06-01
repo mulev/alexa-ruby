@@ -70,11 +70,32 @@ module AlexaRuby
       @obj[:image] = {}
 
       if @params[:small_image_url]
-        @obj[:image][:smallImageUrl] = @params[:small_image_url]
+        add_image(:smallImageUrl, @params[:small_image_url])
       end
 
       return unless @params[:large_image_url]
-      @obj[:image][:largeImageUrl] = @params[:large_image_url]
+      add_image(:largeImageUrl, @params[:large_image_url])
+    end
+
+    # Add image to object
+    #
+    # @param type [Symbol] image type
+    # @param image_url [String] image URL
+    # @raise [ArgumentError] if card URL doesn't starts with HTTPS
+    def add_image(type, image_url)
+      if invalid_url?(image_url)
+        raise ArgumentError, 'Card image URL must be a valid ' \
+                              'SSL-enabled (HTTPS) endpoint'
+      end
+      @obj[:image][type] = image_url
+    end
+
+    # Check if given URL isn't an SSL-enabled endpoint
+    #
+    # @param url [String] some URL
+    # @return [Boolean]
+    def invalid_url?(url)
+      URI.parse(url).scheme != 'https'
     end
   end
 end
