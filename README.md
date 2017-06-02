@@ -41,8 +41,10 @@ Gem provides a possibility to easily handle requests from Amazon Alexa service a
 
 ### Getting started
 
-AlexaRuby usage is quite simple, to start you need to require gem in your ruby file and pass it JSON request from Amazon Alexa service.  
-Here and below all examples will be based on Roda routing tree framework.
+AlexaRuby usage is quite simple, to start you need to require gem in your ruby
+file and pass it JSON request from Amazon Alexa service.  
+Here and below all examples will be based on Roda routing tree framework, but
+you can use any other -- AlexaRuby is a framework independent gem.
 
 ```ruby
 require 'roda'
@@ -59,47 +61,39 @@ class App < Roda
 end
 ```
 
-After initializing new AlexaRuby instance you will have a possibility to access all parameters of the received request:
+After initializing new AlexaRuby instance you will have a possibility to access
+all parameters of the received request:
 
-```ruby
-# All request types
-alexa.request.json                            # given JSON request
-alexa.request.version                         # request version, typically "1.0"
-alexa.request.type                            # request type, can be :launch, :intent, :session_ended or :audio_player
-alexa.request.id                              # request ID
-alexa.request.timestamp                       # request timestamp
-alexa.request.locale                          # request locale
-
-# IntentRequest
-alexa.request.intent_name                     # given intent name
-alexa.request.dialog_state                    # state of dialog with user, can be :started, :in_progress or :completed
-alexa.request.confirmation_status             # user confirmation status, can be :unknown, :confirmed or :denied
-alexa.request.slots                           # array with all slots from intent
-
-# AudioPlayerRequest
-alexa.request.playback_state                  # current playback state
-alexa.request.playback_offset                 # current playback offset in milliseconds
-alexa.request.error_type                      # playback error type
-alexa.request.error_message                   # playback error message explaining error
-alexa.request.error_playback_token            # audio player token of failed playback
-alexa.request.error_player_activity           # audio player activity in moment of failure
-
-# Session parameters
-alexa.request.session.id                      # session ID
-alexa.request.session.attributes              # array with all session attributes
-alexa.request.session.end_reason              # session end reason, can be :user_quit, :processing_error or :user_idle
-alexa.request.session.error                   # hash with session error info
-alexa.request.session.state                   # current session state, can be :new, :old or :ended
-
-# Context parameters
-alexa.request.context.app_id                  # Alexa application ID
-alexa.request.context.api_endpoint            # Alexa API endpoint
-alexa.request.context.user.id                 # skill user ID
-alexa.request.context.user.access_token       # user access token if account linking is enabled and user is authenticated
-alexa.request.context.user.permissions_token  # user permissions token
-alexa.request.context.device.id               # user device ID
-alexa.request.context.device.interfaces       # interfaces, supported by user device
-```
+|Access path|Description|
+|---|---|
+|alexa.request.json|given JSON request|
+|alexa.request.version|request version, typically "1.0"|
+|alexa.request.type|request type, can be :launch, :intent, :session_ended or :audio_player|
+|alexa.request.id|request ID|
+|alexa.request.timestamp|request timestamp|
+|alexa.request.locale|request locale|
+|alexa.request.intent_name|given intent name|
+|alexa.request.dialog_state|state of dialog with user, can be :started, :in_progress or :completed|
+|alexa.request.confirmation_status|user confirmation status, can be :unknown, :confirmed or :denied|
+|alexa.request.slots|array with all slots from intent|
+|alexa.request.playback_state|current playback state|
+|alexa.request.playback_offset|current playback offset in milliseconds|
+|alexa.request.error_type|playback error type|
+|alexa.request.error_message|playback error message explaining error|
+|alexa.request.error_playback_token|audio player token of failed playback|
+|alexa.request.error_player_activity|audio player activity in moment of failure|
+|alexa.request.session.id|session ID|
+|alexa.request.session.attributes|array with all session attributes|
+|alexa.request.session.end_reason|session end reason, can be :user_quit, :processing_error or :user_idle|
+|alexa.request.session.error|hash with session error info|
+|alexa.request.session.state|current session state, can be :new, :old or :ended|
+|alexa.request.context.app_id|Alexa application ID|
+|alexa.request.context.api_endpoint|Alexa API endpoint|
+|alexa.request.context.user.id|skill user ID|
+|alexa.request.context.user.access_token|user access token if account linking is enabled and user is authenticated|
+|alexa.request.context.user.permissions_token|user permissions token|
+|alexa.request.context.device.id|user device ID|
+|alexa.request.context.device.interfaces|interfaces, supported by user device|
 
 ### Building response
 
@@ -107,18 +101,17 @@ To build a response take your freshly initialized `alexa` and start using `alexa
 
 #### Add session attributes
 
-To add one attribute use:
+It is possible to add one attribute:
 
 ```ruby
-# Add one session attribute
-#
-# @param key [String] atrribute key
-# @param value [String] attribute value
-# @param rewrite [Boolean] rewrite if key already exists?
-# @raise [ArgumentError] if session key is already added and
-#   rewrite is set to false
 alexa.response.add_session_attribute('key', 'value')
-alexa.response.add_session_attribute('key', 'value_2', true) # will rewrite previously set attribute 'key'
+```
+
+Exception will be raised if attribute already exists in the session scope.  
+If you want to overwrite it, call:
+
+```ruby
+alexa.response.add_session_attribute('key', 'value_2', true)
 ```
 
 You can also add a pack of attributes:
