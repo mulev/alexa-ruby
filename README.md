@@ -62,7 +62,9 @@ end
 ```
 
 After initializing new AlexaRuby instance you will have a possibility to access
-all parameters of the received request:
+all parameters of the received request.
+
+#### General request parameters
 
 |Access path|Description|
 |---|---|
@@ -72,21 +74,25 @@ all parameters of the received request:
 |alexa.request.id|request ID|
 |alexa.request.timestamp|request timestamp|
 |alexa.request.locale|request locale|
-|alexa.request.intent_name|given intent name|
-|alexa.request.dialog_state|state of dialog with user, can be :started, :in_progress or :completed|
-|alexa.request.confirmation_status|user confirmation status, can be :unknown, :confirmed or :denied|
-|alexa.request.slots|array with all slots from intent|
-|alexa.request.playback_state|current playback state|
-|alexa.request.playback_offset|current playback offset in milliseconds|
-|alexa.request.error_type|playback error type|
-|alexa.request.error_message|playback error message explaining error|
-|alexa.request.error_playback_token|audio player token of failed playback|
-|alexa.request.error_player_activity|audio player activity in moment of failure|
+
+#### Session parameters
+
+Notice that user data exists in two scopes -- session and context.
+
+|Access path|Description|
+|---|---|
 |alexa.request.session.id|session ID|
 |alexa.request.session.attributes|array with all session attributes|
 |alexa.request.session.end_reason|session end reason, can be :user_quit, :processing_error or :user_idle|
 |alexa.request.session.error|hash with session error info|
 |alexa.request.session.state|current session state, can be :new, :old or :ended|
+
+#### Context parameters
+
+Notice that user data exists in two scopes -- session and context.
+
+|Access path|Description|
+|---|---|
 |alexa.request.context.app_id|Alexa application ID|
 |alexa.request.context.api_endpoint|Alexa API endpoint|
 |alexa.request.context.user.id|skill user ID|
@@ -95,13 +101,33 @@ all parameters of the received request:
 |alexa.request.context.device.id|user device ID|
 |alexa.request.context.device.interfaces|interfaces, supported by user device|
 
+#### Intent request parameters
+
+|Access path|Description|
+|---|---|
+|alexa.request.intent_name|given intent name|
+|alexa.request.dialog_state|state of dialog with user, can be :started, :in_progress or :completed|
+|alexa.request.confirmation_status|user confirmation status, can be :unknown, :confirmed or :denied|
+|alexa.request.slots|array with all slots from intent|
+
+#### Audio player request parameters
+
+|Access path|Description|
+|---|---|
+|alexa.request.playback_state|current playback state|
+|alexa.request.playback_offset|current playback offset in milliseconds|
+|alexa.request.error_type|playback error type|
+|alexa.request.error_message|playback error message explaining error|
+|alexa.request.error_playback_token|audio player token of failed playback|
+|alexa.request.error_player_activity|audio player activity in moment of failure|
+
 ### Building response
 
 To build a response take your freshly initialized `alexa` and start using `alexa.response` methods.
 
 #### Add session attributes
 
-It is possible to add one attribute:
+It is possible to add one attribute to session scope:
 
 ```ruby
 alexa.response.add_session_attribute('key', 'value')
@@ -114,22 +140,15 @@ If you want to overwrite it, call:
 alexa.response.add_session_attribute('key', 'value_2', true)
 ```
 
-You can also add a pack of attributes:
+You can also add a pack of attributes. To overwrite all existing ones call:
 
 ```ruby
-attributes = { key: 'value', key_2: 'value_2' }
+alexa.response.add_session_attributes(key: 'value', key_2: 'value_2')
+```
 
-# Add pack of session attributes and overwrite all existing ones
-#
-# @param attributes [Hash] pack of session attributes
-# @raise [ArgumentError] if given paramter is not a Hash object
-alexa.response.add_session_attributes(attributes) # will overwrite all existing attributes
-
-# Add pack of session attributes to existing ones
-#
-# @param attributes [Hash] pack of session attributes
-# @raise [ArgumentError] if given paramter is not a Hash object
-alexa.response.merge_session_attributes(attributes) # will add given attributes to existing ones and fail in case of duplicate keys
+To add new attributes and save existing ones call:
+```ruby
+alexa.response.merge_session_attributes(key: 'value', key_2: 'value_2')
 ```
 
 #### Add card
@@ -142,36 +161,23 @@ card = {
   small_image_url: 'https://test.ru/example_small.jpg',
   large_image_url: 'https://test.ru/example_large.jpg'
 }
-
-# Add card to response object
-#
-# @param params [Hash] card parameters:
-#   type [String] card type, can be "Simple", "Standard" or "LinkAccount"
-#   title [String] card title
-#   content [String] card content (line breaks must be already included)
-#   small_image_url [String] an URL for small card image
-#   large_image_url [String] an URL for large card image
-# @raise [ArgumentError] if card is not allowed
 alexa.response.add_card(card)
 ```
 
 #### Add audio player directive
 
-Supported directives - AudioPlayer.Play and AudioPlayer.Stop.
+Supported directives - AudioPlayer.Play and AudioPlayer.Stop.  
+To start playback call:
 
 ```ruby
 params = { url: 'https://my-site.com/my-stream', token: 'test', offset: 0 }
+alexa.response.add_audio_player_directive(:start, params)
+```
 
-# Add AudioPlayer directive
-#
-# @param directive [String] audio player directive type,
-#                           can be :start or :stop
-# @param params [Hash] optional request parameters:
-#   url [String] streaming URL
-#   token [String] streaming service token
-#   offset [Integer] playback offset
-alexa.response.add_audio_player_directive(:start, params) # this one will build AudioPlayer.Play directive
-alexa.response.add_audio_player_directive(:stop) # this one will build AudioPlayer.Stop directive
+To stop playback call:
+
+```ruby
+alexa.response.add_audio_player_directive(:stop)
 ```
 
 #### Get current state of response encoded in JSON
@@ -187,27 +193,10 @@ Ask user a question and wait for response (session will remain open):
 ```ruby
 question = 'What can I do for you?'
 
-# Ask something from user and wait for further information.
-# Method will only add given sppech to response object and
-# set "shouldEndSession" parameter to false
-#
-# @param speech [Sring] output speech
-# @param reprompt_speech [String] output speech if user remains idle
-# @param ssml [Boolean] is it an SSML speech or not
 alexa.response.ask(question)                  # will add outputSpeech node
 alexa.response.ask(question, question)        # outputSpeech node and reprompt node
 alexa.response.ask(question, question, true)  # outputSpeech node, reprompt node and both will be converted into SSML
-
-# Ask something from user and wait for further information.
-# Method will only add given sppech to response object,
-# set "shouldEndSession" parameter to false and
-# immediately return response JSON implementation
-#
-# @param speech [Sring] output speech
-# @param reprompt_speech [String] output speech if user remains idle
-# @param ssml [Boolean] is it an SSML speech or not
-# @return [JSON] ready to use response object
-alexa.response.ask!(question)
+alexa.response.ask!(question)                 # will add outputSpeech node and return JSON encoded response object
 ```
 
 Tell something to user and end conversation (session will be closed):
@@ -215,25 +204,10 @@ Tell something to user and end conversation (session will be closed):
 ```ruby
 speech = 'You are awesome!'
 
-# Tell something to Alexa user and close conversation.
-# Method will only add a given speech to response object
-#
-# @param speech [Sring] output speech
-# @param reprompt_speech [String] output speech if user remains idle
-# @param ssml [Boolean] is it an SSML speech or not
 alexa.response.tell(speech)               # will add outputSpeech node
 alexa.response.tell(speech, speech)       # outputSpeech node and reprompt node
 alexa.response.tell(speech, speech, true) # outputSpeech node, reprompt node and both will be converted into SSML
-
-# Tell something to Alexa user and close conversation.
-# Method will add given sppech to response object and
-# immediately return its JSON implementation
-#
-# @param speech [Sring] output speech
-# @param reprompt_speech [String] output speech if user remains idle
-# @param ssml [Boolean] is it an SSML speech or not
-# @return [JSON] ready to use response object
-alexa.response.tell!(speech)
+alexa.response.tell!(speech)              # will add outputSpeech node and return JSON encoded response object
 ```
 
 ## Testing
@@ -259,4 +233,4 @@ All development is made only in develop branch before being merged to master.
 
 ## License
 
-AlexaRuby is released under [MIT license](https://github.com/mulev/alexa-ruby/blob/master/LICENSE).
+AlexaRuby is released under the [MIT license](https://github.com/mulev/alexa-ruby/blob/master/LICENSE).
