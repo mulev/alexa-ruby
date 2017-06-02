@@ -31,6 +31,7 @@ $ gem install alexa_ruby
 
 |Resource|URL|
 |---|---|
+|Amazon Alexa Skill Kit docs|[https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference)|
 |Rubydoc|[http://www.rubydoc.info/gems/alexa_ruby](http://www.rubydoc.info/gems/alexa_ruby)|
 |Source|[https://github.com/mulev/alexa-ruby](https://github.com/mulev/alexa-ruby)|
 |Bugs|[https://github.com/mulev/alexa-ruby/issues](https://github.com/mulev/alexa-ruby/issues)|
@@ -86,6 +87,9 @@ Notice that user data exists in two scopes -- session and context.
 |alexa.request.session.end_reason|session end reason, can be :user_quit, :processing_error or :user_idle|
 |alexa.request.session.error|hash with session error info|
 |alexa.request.session.state|current session state, can be :new, :old or :ended|
+|alexa.request.session.user.id|skill user ID|
+|alexa.request.session.user.access_token|user access token if account linking is enabled and user is authenticated|
+|alexa.request.session.user.permissions_token|user permissions token|
 
 #### Context parameters
 
@@ -147,13 +151,14 @@ alexa.response.add_session_attributes(key: 'value', key_2: 'value_2')
 ```
 
 To add new attributes and save existing ones call:
+
 ```ruby
 alexa.response.merge_session_attributes(key: 'value', key_2: 'value_2')
 ```
 
 #### Add card
 
-Supported card types are: Simple and Standard. LinkAccount will be added soon.
+Supported card types are: Simple, Standard and LinkAccount.
 
 ```ruby
 card = {
@@ -196,6 +201,7 @@ question = 'What can I do for you?'
 alexa.response.ask(question)                  # will add outputSpeech node
 alexa.response.ask(question, question)        # outputSpeech node and reprompt node
 alexa.response.ask(question, question, true)  # outputSpeech node, reprompt node and both will be converted into SSML
+
 alexa.response.ask!(question)                 # will add outputSpeech node and return JSON encoded response object
 ```
 
@@ -207,6 +213,7 @@ speech = 'You are awesome!'
 alexa.response.tell(speech)               # will add outputSpeech node
 alexa.response.tell(speech, speech)       # outputSpeech node and reprompt node
 alexa.response.tell(speech, speech, true) # outputSpeech node, reprompt node and both will be converted into SSML
+
 alexa.response.tell!(speech)              # will add outputSpeech node and return JSON encoded response object
 ```
 

@@ -1,7 +1,7 @@
 module AlexaRuby
   # Amazon Alexa user session
   class Session
-    attr_reader :id, :attributes, :end_reason, :error
+    attr_reader :id, :attributes, :user, :end_reason, :error
     attr_accessor :state
 
     # Initialize new Session
@@ -15,6 +15,7 @@ module AlexaRuby
       @state = @session[:new] ? :new : :old
       @id = @session[:sessionId]
       @attributes = @session[:attributes] || {}
+      @user = load_user unless @session[:user].nil?
     end
 
     # Set session end reason
@@ -55,6 +56,13 @@ module AlexaRuby
     # @return [Boolean]
     def invalid_session?
       @session.nil?
+    end
+
+    # Initialize user parameters
+    #
+    # @return [Object] new User object instance
+    def load_user
+      User.new(@session[:user])
     end
   end
 end
