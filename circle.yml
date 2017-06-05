@@ -1,3 +1,6 @@
+dependencies:
+  override:
+    - bundle install
 test:
   override:
     - rake test
