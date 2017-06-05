@@ -2,6 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/alexa_ruby.svg)](https://badge.fury.io/rb/alexa_ruby)
 [![Build Status](https://travis-ci.org/mulev/alexa-ruby.svg?branch=master)](https://travis-ci.org/mulev/alexa-ruby)
+[![CircleCI](https://circleci.com/bb/mmulev/alexa-ruby/tree/master.svg?style=svg&circle-token=6a8088af16c301880712400c2db43ed32e1291f3)](https://circleci.com/bb/mmulev/alexa-ruby/tree/master)
 [![Code Climate](https://codeclimate.com/github/mulev/alexa-ruby/badges/gpa.svg)](https://codeclimate.com/github/mulev/alexa-ruby)
 [![Coverage Status](https://coveralls.io/repos/github/mulev/alexa-ruby/badge.svg?branch=develop)](https://coveralls.io/github/mulev/alexa-ruby?branch=develop)
 
