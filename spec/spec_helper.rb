@@ -1,5 +1,5 @@
-require 'coveralls'
-Coveralls.wear!
+# require 'coveralls'
+# Coveralls.wear!
 
 require 'minitest/autorun'
 require 'minitest/reporters'
