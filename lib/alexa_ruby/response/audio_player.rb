@@ -15,7 +15,7 @@ module AlexaRuby
         raise ArgumentError, 'Audio URL must be a valid ' \
                               'SSL-enabled (HTTPS) endpoint'
       end
-      token = params[:token] || SecureRandom.uuid
+      token = token(params[:token])
       offset = params[:offset] || 0
       build_directive('AudioPlayer.Play', url, token, offset)
     end
@@ -52,6 +52,14 @@ module AlexaRuby
     # @return [Boolean]
     def invalid_url?(url)
       URI.parse(url).scheme != 'https'
+    end
+
+    # Get station token
+    #
+    # @param token [String] station token
+    # @return [Boolean]
+    def token(token)
+      token.nil? || token.empty? ? SecureRandom.uuid : token
     end
   end
 end
