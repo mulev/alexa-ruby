@@ -1,0 +1,4 @@
+[1.2.0]
+- Add support of ENQUEUE type in AudioPlayer directive
+- Add support of AudioPlayer.ClearQueue directive
+- Minor refactoring

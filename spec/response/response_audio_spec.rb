@@ -16,7 +16,7 @@ describe 'AlexaRuby::Response' do
       @alexa = AlexaRuby.new(@json)
     end
 
-    it 'should add AudioPlayer.Play directive' do
+    it 'should add replacing all AudioPlayer.Play directive' do
       @alexa.response.add_audio_player_directive(:start, @audio)
       resp = Oj.load(@alexa.response.json, symbol_keys: true)
       directive = resp[:response][:directives][0]
@@ -26,6 +26,51 @@ describe 'AlexaRuby::Response' do
       stream[:url].must_equal @audio[:url]
       stream[:token].must_equal @audio[:token]
       stream[:offsetInMilliseconds].must_equal @audio[:offset]
+    end
+
+    it 'should add replacing enqueued AudioPlayer.Play directive' do
+      @audio[:play_behavior] = :replace_enqueued
+      @alexa.response.add_audio_player_directive(:start, @audio)
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      directive = resp[:response][:directives][0]
+      directive[:type].must_equal 'AudioPlayer.Play'
+      directive[:playBehavior].must_equal 'REPLACE_ENQUEUED'
+      stream = directive[:audioItem][:stream]
+      stream[:url].must_equal @audio[:url]
+      stream[:token].must_equal @audio[:token]
+      stream[:offsetInMilliseconds].must_equal @audio[:offset]
+    end
+
+    it 'should add enqueuing AudioPlayer.Play directive' do
+      @audio[:play_behavior] = :enqueue
+      @alexa.response.add_audio_player_directive(:start, @audio)
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      directive = resp[:response][:directives][0]
+      directive[:type].must_equal 'AudioPlayer.Play'
+      directive[:playBehavior].must_equal 'ENQUEUE'
+      stream = directive[:audioItem][:stream]
+      stream[:url].must_equal @audio[:url]
+      stream[:token].must_equal @audio[:token]
+      stream[:offsetInMilliseconds].must_equal @audio[:offset]
+    end
+
+    it 'should add AudioPlayer.ClearQueue directive that clears all' do
+      @alexa.response.add_audio_player_directive(:clear)
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      directive = resp[:response][:directives][0]
+      directive[:type].must_equal 'AudioPlayer.ClearQueue'
+      directive[:clearBehavior].must_equal 'CLEAR_ALL'
+    end
+
+    it 'should add AudioPlayer.ClearQueue directive that clears queue' do
+      @alexa.response.add_audio_player_directive(
+        :clear,
+        clear_behavior: :clear_queue
+      )
+      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      directive = resp[:response][:directives][0]
+      directive[:type].must_equal 'AudioPlayer.ClearQueue'
+      directive[:clearBehavior].must_equal 'CLEAR_ENQUEUED'
     end
 
     it 'should add AudioPlayer.Stop directive' do

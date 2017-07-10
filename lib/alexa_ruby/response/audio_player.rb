@@ -4,45 +4,78 @@ module AlexaRuby
     # Build an AudioPlayer.Play directive
     #
     # @param params [Hash] optional request parameters:
+    #   behavior [Symbol] playback behavior
     #   url [String] streaming URL
     #   token [String] streaming service token
+    #   previous_token [String] previous played audio token
     #   offset [Integer] playback offset
     # @return [Hash] AudioPlayer.Play directive
     # @raise [ArgumentError] if audio URL isn't valid
-    def play_directive(params)
-      url = params[:url]
-      if invalid_url?(url)
+    def play(params)
+      @opts = params
+      if invalid_url?(@opts[:url])
         raise ArgumentError, 'Audio URL must be a valid ' \
                               'SSL-enabled (HTTPS) endpoint'
       end
-      token = token(params[:token])
-      offset = params[:offset] || 0
-      build_directive('AudioPlayer.Play', url, token, offset)
+      play_directive
     end
 
     # Build AudioPlayer.Stop directive
     #
     # @return [Hash] AudioPlayer.Stop directive
-    def stop_directive
-      build_directive('AudioPlayer.Stop')
+    def stop
+      { type: 'AudioPlayer.Stop' }
+    end
+
+    # Build AudioPlayer.ClearQueue directive
+    #
+    # @param behavior [Symbol] clearing behavior
+    # @return [Hash] AudioPlayer.ClearQueue directive
+    def clear_queue(behavior = :clear_all)
+      clear_behavior =
+        case behavior
+        when :clear_all
+          'CLEAR_ALL'
+        when :clear_queue
+          'CLEAR_ENQUEUED'
+        else
+          'CLEAR_ALL'
+        end
+      { type: 'AudioPlayer.ClearQueue', clearBehavior: clear_behavior }
     end
 
     private
 
-    # Set play directive parameters
+    # Define playback behavior
     #
-    # @param type [String] directive type, can be Play or Stop
-    # @param url [String] streaming service URL
-    # @param token [String] streaming service token
-    # @param offset [Integer] playback offset
-    def build_directive(type, url = nil, token = nil, offset = nil)
-      directive = { type: type }
-      return directive if type == 'AudioPlayer.Stop'
-      directive[:playBehavior] = 'REPLACE_ALL'
-      directive[:audioItem] = { stream: {} }
-      directive[:audioItem][:stream][:url] = url
-      directive[:audioItem][:stream][:token] = token
-      directive[:audioItem][:stream][:offsetInMilliseconds] = offset
+    # @param behavior [Symbol] playback behavior
+    # @return [String] Amazon behavior type
+    def playback_behavior(behavior)
+      case behavior
+      when :replace_all
+        'REPLACE_ALL'
+      when :enqueue
+        'ENQUEUE'
+      when :replace_enqueued
+        'REPLACE_ENQUEUED'
+      else
+        'REPLACE_ALL'
+      end
+    end
+
+    # Build play directive
+    #
+    # @return [Hash] ready to use AudioPlayer.Play directive
+    def play_directive
+      directive = { type: 'AudioPlayer.Play' }
+      directive[:playBehavior] = playback_behavior(@opts[:play_behavior])
+      directive[:audioItem] = { stream: { url: @opts[:url] } }
+      stream = directive[:audioItem][:stream]
+      stream[:token] = token(@opts[:token])
+      stream[:offsetInMilliseconds] = @opts[:offset] || 0
+      if @opts[:behavior] == :enqueue
+        stream[:expectedPreviousToken] = @opts[:previous_token]
+      end
       directive
     end
 

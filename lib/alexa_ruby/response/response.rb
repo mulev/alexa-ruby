@@ -22,12 +22,7 @@ module AlexaRuby
     # @raise [ArgumentError] if session key is already added and
     #   rewrite is set to false
     def add_session_attribute(key, value, rewrite = false)
-      unless rewrite
-        if @resp[:sessionAttributes].key?(key)
-          raise ArgumentError, 'Duplicate session attributes not allowed'
-        end
-      end
-      @resp[:sessionAttributes][key] = value
+      session_attribute(key, value, rewrite)
     end
 
     # Add pack of session attributes and overwrite all existing ones
@@ -75,14 +70,16 @@ module AlexaRuby
     #   url [String] streaming URL
     #   token [String] streaming service token
     #   offset [Integer] playback offset
+    #   replace_all [Boolean] true if stream must replace all previous
     def add_audio_player_directive(directive, params = {})
-      player = AudioPlayer.new
       @resp[:response][:directives] = [
         case directive.to_sym
         when :start
-          player.play_directive(params)
+          AudioPlayer.new.play(params)
         when :stop
-          player.stop_directive
+          AudioPlayer.new.stop
+        when :clear
+          AudioPlayer.new.clear_queue(params[:clear_behavior])
         end
       ]
     end
@@ -153,18 +150,34 @@ module AlexaRuby
 
     private
 
+    # Add one session attribute
+    #
+    # @param key [String] atrribute key
+    # @param value [String] attribute value
+    # @param rewrite [Boolean] rewrite if key already exists?
+    # @raise [ArgumentError] if session key is already added and
+    #   rewrite is set to false
+    def session_attribute(key, value, rewrite = false)
+      unless rewrite
+        if @resp[:sessionAttributes].key?(key)
+          raise ArgumentError, 'Duplicate session attributes not allowed'
+        end
+      end
+      @resp[:sessionAttributes][key] = value
+    end
+
     # Add pack of session attributes.
     # By default all existing session attributes would be overwritten
     #
     # @param attributes [Hash] pack of session attributes
     # @param merge [Boolean] merge attributes with existing ones?
     def session_attributes(attributes, merge)
-      if merge
-        attributes.each { |k, v| add_session_attribute(k, v, true) }
-      else
+      rewrite = true
+      unless merge
         @resp[:sessionAttributes] = {}
-        attributes.each { |k, v| add_session_attribute(k, v, false) }
+        rewrite = false
       end
+      attributes.each { |k, v| session_attribute(k, v, rewrite) }
     end
 
     # Build speech object
@@ -173,13 +186,8 @@ module AlexaRuby
     # @param ssml [Boolean] is it an SSML speech or not
     # @return [Hash] speech object
     def build_speech(speech, ssml)
-      obj = {}
-      obj[:type] = ssml ? 'SSML' : 'PlainText'
-      if ssml
-        obj[:ssml] = fix_ssml(speech)
-      else
-        obj[:text] = speech
-      end
+      obj = { type: ssml ? 'SSML' : 'PlainText' }
+      ssml ? obj[:ssml] = fix_ssml(speech) : obj[:text] = speech
       obj
     end
 

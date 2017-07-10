@@ -172,12 +172,46 @@ alexa.response.add_card(card)
 
 #### Add audio player directive
 
-Supported directives - AudioPlayer.Play and AudioPlayer.Stop.  
-To start playback call:
+Supported directives:
+
+ - AudioPlayer.Play
+ - AudioPlayer.ClearQueue
+ - AudioPlayer.Stop
+
+To start the whole new playback call:
 
 ```ruby
 params = { url: 'https://my-site.com/my-stream', token: 'test', offset: 0 }
 alexa.response.add_audio_player_directive(:start, params)
+```
+
+To enqueue new audio file call:
+
+```ruby
+params = { url: 'https://my-site.com/my-stream', token: 'test', offset: 0, play_behavior: :enqueue }
+alexa.response.add_audio_player_directive(:start, params)
+```
+
+To replace all previously enqueued audio files call:
+
+```ruby
+params = { url: 'https://my-site.com/my-stream', token: 'test', offset: 0, play_behavior: :replace_enqueued }
+alexa.response.add_audio_player_directive(:start, params)
+```
+
+To clear all:
+
+```ruby
+alexa.response.add_audio_player_directive(:clear)
+```
+
+To clear only enqueued tracks and keep the playing one:
+
+```ruby
+alexa.response.add_audio_player_directive(
+  :clear,
+  clear_behavior: :clear_queue
+)
 ```
 
 To stop playback call:
