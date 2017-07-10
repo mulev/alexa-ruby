@@ -1,3 +1,6 @@
+[1.2.1]
+- Fixed issue with expectedPreviousToken property in enqueuing AudioPlayer.Play directive
+
 [1.2.0]
 - Add support of ENQUEUE type in AudioPlayer directive
 - Add support of AudioPlayer.ClearQueue directive

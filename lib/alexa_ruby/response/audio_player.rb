@@ -73,8 +73,8 @@ module AlexaRuby
       stream = directive[:audioItem][:stream]
       stream[:token] = token(@opts[:token])
       stream[:offsetInMilliseconds] = @opts[:offset] || 0
-      if @opts[:behavior] == :enqueue
-        stream[:expectedPreviousToken] = @opts[:previous_token]
+      if directive[:playBehavior] == 'ENQUEUE'
+        stream[:expectedPreviousToken] = @opts[:previous_token] || ''
       end
       directive
     end
