@@ -63,6 +63,12 @@ class App < Roda
 end
 ```
 
+Request validations can be disabled:
+
+```ruby
+AlexaRuby.new(request, disable_validations: true)
+```
+
 After initializing new AlexaRuby instance you will have a possibility to access
 all parameters of the received request.
 

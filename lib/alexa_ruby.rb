@@ -26,11 +26,13 @@ module AlexaRuby
     #
     # @param request [Object] request from Amazon Alexa web service,
     #                         can be hash or JSON encoded string
+    # @param opts [Hash] additional options:
+    #   :disable_validations [Boolean] disables request validation if true
     # @return [Object] new Request object instance
     # @raise [ArgumentError] if given object isn't a valid JSON object
-    def new(request)
+    def new(request, opts = {})
       obj = build_json(request)
-      Alexa.new(obj)
+      Alexa.new(obj, opts)
     end
 
     private

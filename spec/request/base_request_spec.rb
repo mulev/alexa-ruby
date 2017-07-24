@@ -83,6 +83,13 @@ describe 'AlexaRuby' do
         err.message.must_equal msg
       end
 
+      it 'should not raise ArgumentError if request structure isn\'t valid and validations are disabled' do
+        req = Oj.load(@json, symbol_keys: true)
+        req[:version] = nil
+        alexa = AlexaRuby.new(req, disable_validations: true)
+        alexa.request.version.must_be_nil
+      end
+
       it 'should return received request in JSON format' do
         alexa = AlexaRuby.new(@json)
         sample = Oj.to_json(Oj.load(@json))

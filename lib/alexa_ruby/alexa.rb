@@ -7,8 +7,11 @@ module AlexaRuby
     # Initialize new Alexa assistant
     #
     # @param request [Hash] request from Amazon Alexa web service
-    def initialize(request)
+    # @param opts [Hash] additional options:
+    #   :disable_validations [Boolean] disables request validation if true
+    def initialize(request, opts)
       @req = request
+      @opts = opts
       invalid_request_exception if invalid_request?
       @request = define_request
       raise ArgumentError, 'Unknown type of Alexa request' if @request.nil?
@@ -17,11 +20,18 @@ module AlexaRuby
 
     private
 
+    # Check if validations are enabled
+    #
+    # @return [Boolean]
+    def validations_enabled?
+      !@opts[:disable_validations] || @opts[:disable_validations].nil?
+    end
+
     # Check if it is an invalid request
     #
     # @return [Boolean]
     def invalid_request?
-      @req[:version].nil? || @req[:request].nil?
+      @req[:version].nil? || @req[:request].nil? if validations_enabled?
     end
 
     # Request structure isn't valid, raise exception
