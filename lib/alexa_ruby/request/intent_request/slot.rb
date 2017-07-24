@@ -20,7 +20,7 @@ module AlexaRuby
     #
     # @return [Boolean]
     def invalid_slot?
-      @slot[:name].nil? || @slot[:value].nil?
+      @slot[:name].nil?
     end
 
     # Define user confirmation status
