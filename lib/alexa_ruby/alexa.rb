@@ -15,16 +15,19 @@ module AlexaRuby
       invalid_request_exception if invalid_request?
       @request = define_request
       raise ArgumentError, 'Unknown type of Alexa request' if @request.nil?
+      @request.valid? if ssl_check?
       @response = Response.new(@request.type, @request.version)
     end
 
     private
 
-    # Check if validations are enabled
-    #
-    # @return [Boolean]
-    def validations_enabled?
-      !@opts[:disable_validations] || @opts[:disable_validations].nil?
+    # Request structure isn't valid, raise exception
+    def invalid_request_exception
+      raise ArgumentError,
+            'Invalid request structure, ' \
+            'please, refer to the Amazon Alexa manual: ' \
+            'https://developer.amazon.com/public/solutions' \
+            '/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference'
     end
 
     # Check if it is an invalid request
@@ -34,13 +37,11 @@ module AlexaRuby
       @req[:version].nil? || @req[:request].nil? if validations_enabled?
     end
 
-    # Request structure isn't valid, raise exception
-    def invalid_request_exception
-      raise ArgumentError,
-            'Invalid request structure, ' \
-            'please, refer to the Amazon Alexa manual: ' \
-            'https://developer.amazon.com/public/solutions' \
-            '/alexa/alexa-skills-kit/docs/alexa-skills-kit-interface-reference'
+    # Check if validations are enabled
+    #
+    # @return [Boolean]
+    def validations_enabled?
+      !@opts[:disable_validations] || @opts[:disable_validations].nil?
     end
 
     # Initialize proper request object
@@ -57,6 +58,16 @@ module AlexaRuby
       when /AudioPlayer/, /PlaybackController/
         AudioPlayerRequest.new(@req)
       end
+    end
+
+    # Check if we have SSL certificates URL and request signature
+    # and need to validate Amazon request
+    #
+    # @return [Boolean]
+    def ssl_check?
+      @request.certificates_chain_url = @opts[:certificates_chain_url]
+      @request.signature = @opts[:request_signature]
+      @request.certificates_chain_url && @request.signature
     end
   end
 end

@@ -95,7 +95,7 @@ module AlexaRuby
     # @param url [String] some URL
     # @return [Boolean]
     def invalid_url?(url)
-      URI.parse(url).scheme != 'https'
+      Addressable::URI.parse(url).scheme != 'https'
     end
   end
 end

@@ -1,4 +1,5 @@
 # Utilities
+require 'addressable/uri'
 require 'oj'
 require 'securerandom'
 
@@ -8,6 +9,9 @@ require 'alexa_ruby/request/base_request'
 require 'alexa_ruby/request/base_request/context'
 require 'alexa_ruby/request/base_request/context/device'
 require 'alexa_ruby/request/base_request/session'
+require 'alexa_ruby/request/base_request/validator'
+require 'alexa_ruby/request/base_request/validator/uri'
+require 'alexa_ruby/request/base_request/validator/certificates'
 require 'alexa_ruby/request/base_request/user'
 require 'alexa_ruby/request/audio_player_request'
 require 'alexa_ruby/request/launch_request'
@@ -28,6 +32,8 @@ module AlexaRuby
     #                         can be hash or JSON encoded string
     # @param opts [Hash] additional options:
     #   :disable_validations [Boolean] disables request validation if true
+    #   :certificates_chain_url [String] URL of Amazon SSL certificates chain
+    #   :request_signature [String] Base64-encoded request signature
     # @return [Object] new Request object instance
     # @raise [ArgumentError] if given object isn't a valid JSON object
     def new(request, opts = {})
