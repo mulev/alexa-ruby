@@ -1,3 +1,5 @@
+require 'time'
+
 module AlexaRuby
   # Validator is responsible for Amazon request validation:
   #   - SignatureCertChainUrl validation
