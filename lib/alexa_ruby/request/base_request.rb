@@ -2,6 +2,7 @@ module AlexaRuby
   # Amazon Alexa web service request
   class BaseRequest
     attr_reader :version, :type, :session, :context, :id, :timestamp, :locale
+    attr_accessor :certificates_chain_url, :signature
 
     # Initialize new request object
     #
@@ -15,6 +16,14 @@ module AlexaRuby
       @timestamp = nil
       @locale = nil
       parse_base_params(@req[:request])
+    end
+
+    # Check if it is a valid Amazon request
+    #
+    # @return [Boolean]
+    def valid?
+      validator = Validator.new(certificates_chain_url, signature, @req)
+      validator.valid_request?
     end
 
     # Return JSON representation of given request
