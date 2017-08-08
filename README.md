@@ -63,10 +63,20 @@ class App < Roda
 end
 ```
 
-Request validations can be disabled:
+Request structure validations can be disabled:
 
 ```ruby
 AlexaRuby.new(request, disable_validations: true)
+```
+
+If needed, you can validate request signature and Amazon SSL certificates chain. To do so specify several parameters:
+
+```ruby
+AlexaRuby.new(
+  request,
+  certificates_chain_url: url,
+  request_signature: signature
+)
 ```
 
 After initializing new AlexaRuby instance you will have a possibility to access
