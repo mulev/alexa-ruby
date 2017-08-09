@@ -25,7 +25,11 @@ module AlexaRuby
     #
     # @return [Boolean]
     def valid_request?
-      raise ArgumentError, 'Outdated request' unless timestamp_tolerant?
+      unless timestamp_tolerant?
+        raise ArgumentError,
+              'Outdated request: request timestamp is more than ' \
+              "#{@timestamp_diff} seconds later than current time"
+      end
       valid_uri? && valid_certificates?
     end
 

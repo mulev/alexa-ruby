@@ -20,10 +20,7 @@ module AlexaRuby
     #
     # @return [Boolean]
     def valid?
-      raise ArgumentError, 'Inactive Amazon SSL certificate' unless active?
-      raise ArgumentError, 'Inactive host in SSL certificate' unless amazon?
-      raise ArgumentError, 'Signature and request mismatch' unless verified?
-      true
+      active? && amazon? && verified?
     end
 
     private
@@ -42,14 +39,24 @@ module AlexaRuby
     # @return [Boolean]
     def active?
       now = Time.now
-      @cert.not_before < now && @cert.not_after > now
+      (@cert.not_before < now && @cert.not_after > now) ||
+        raise(
+          ArgumentError,
+          'Amazon SSL certificate is outdated ' \
+          "specified dates: #{@cert.not_before} - #{@cert.not_after}"
+        )
     end
 
     # Check if Subject Alternative Names includes Amazon domain name
     #
     # @return [Boolean]
     def amazon?
-      @cert.subject.to_a.flatten.include? 'echo-api.amazon.com'
+      @cert.subject.to_a.flatten.include?('echo-api.amazon.com') ||
+        raise(
+          ArgumentError,
+          'Certificate must be issued for "echo-api.amazon.com" ' \
+          "(given certificate subject: #{@cert.subject.to_a})"
+        )
     end
 
     # Check if given signature matches given request
@@ -58,7 +65,12 @@ module AlexaRuby
     def verified?
       sign = decode_signature
       pkey = public_key
-      pkey.verify(hash, sign, @request)
+      pkey.verify(hash, sign, @request) ||
+        raise(
+          ArgumentError,
+          'Given request signature does not match with request SHA1 hash ' \
+          "(signature: #{sign})"
+        )
     end
 
     # Decode base64-encoded signature
