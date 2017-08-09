@@ -69,7 +69,7 @@ module AlexaRuby
         raise(
           ArgumentError,
           'Given request signature does not match with request SHA1 hash ' \
-          "(signature: #{sign})"
+          "(signature: #{@signature})"
         )
     end
 
