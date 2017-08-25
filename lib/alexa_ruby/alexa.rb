@@ -67,7 +67,8 @@ module AlexaRuby
     def ssl_check?
       @request.certificates_chain_url = @opts[:certificates_chain_url]
       @request.signature = @opts[:request_signature]
-      @request.certificates_chain_url && @request.signature
+      @request.certificates_chain_url && @request.signature &&
+        @request.type != :audio_player
     end
   end
 end
