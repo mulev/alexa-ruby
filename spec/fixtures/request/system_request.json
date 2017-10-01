@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "context": {
+    "AudioPlayer": {
+      "offsetInMilliseconds": 2848,
+      "token": "d8974a63-8b61-483f-a5b9-52c6a2e78621",
+      "playerActivity": "PLAYING"
+    },
+    "System": {
+      "application": {
+        "applicationId": "amzn1.ask.skill.3b62f58b-eed3-4be4-9339-6b4d0280eab1"
+      },
+      "user": {
+        "userId": "amzn1.ask.account.AFWYZS4PQO6OLHISVNINUKKE23FTOMLQSX7Q3W6BDOTWWJV5U2FA3JPL4IITSGUXJOAYL3ZYMFZSRFN3EJRKALGP2FSKE2NZTLO52ORF6WPCTN4SCCM2Q2HSJ7AT6SX3LX3HIPGBWRLLUPBYQDI62KDEHIR7PB3ZEZWV5KFL64UZZOPXDL2Q5C56MGVAHNK4DFZ52GX4ZGFTIFY",
+        "permissions": {
+          "consentToken": "Atza|IwEBII_UinzkIOWpmH6xfJ8pEBv5v6L24X_VUvqku2cvB2Qs_ZxZeUkHL_R55hEFQBTny6iJjHtbU-OJWjmwIyYbNz1L11q8Clwxzn5lGVmp0qzRHaitiZLNenZFWIzSdJ23i-ibH3HumP1eENNmgtOiv6B5tAiVT-1HhTEWVQR7MaWOn1OLQCZ0QBd0z5l6_rorginVxeOig28s3tkb5v8jeR19LJ4JGjB3uEQ0o9ksvKSep3Ug_s45ldDMRSMZoaM8dRjynkF5PAr8t6a_Rekdxb6izTc7pksph144QmADlUmmxOWg52sLtnMHkud4rgV2-rSVG4ijm5A4JipWmHTr_norJA6W281JadAVd8c83CT75jA4bkVMlSgypXf06y57tmbswf9abbZRN_6zGgJYtjiHbbA62J8lC6GNMRaBu_ZqlSD8-ENIQGCN_bqmmMH4DDqBmkqU0EkffU8TUTvADWcP1m-D4VNqz_pmIFZQBhR5gA"
+        }
+      },
+      "device": {
+        "deviceId": "amzn1.ask.device.AFK7L4XTYU55CJJFDAYM56JOYJ4BQ2O44LBZVLLFIX4SOOKRGZTZHEJUBB2T6VP5H5K6QXV6TCRPQ4GO2FOAZXTLUOS35QG5FHSSGPIIFR4AXQXWW57D44XZBM36D3RLGBDC6PKMMCKHLWRNO2WLY7KGXJSQ",
+        "supportedInterfaces": {
+          "AudioPlayer": {}
+        }
+      },
+      "apiEndpoint": "https://api.amazonalexa.com"
+    }
+  },
+  "request": {
+    "type": "System.ExceptionEncountered",
+    "requestId": "amzn1.echo-api.request.cc8b3481-ca5d-44bf-ab15-b03c10ee738c",
+    "timestamp": "2017-10-01T13:49:26Z",
+    "locale": "en-US",
+    "error": {
+      "type": "INVALID_RESPONSE",
+      "message": "An exception occurred while dispatching the request to the skill."
+    },
+    "cause": {
+      "requestId": "amzn1.echo-api.request.f5e57db8-eb70-4d44-95c7-fd7575a2581d"
+    }
+  }
+}

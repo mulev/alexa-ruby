@@ -55,7 +55,7 @@ module AlexaRuby
         IntentRequest.new(@req)
       when /SessionEnded/
         SessionEndedRequest.new(@req)
-      when /AudioPlayer/, /Playback/
+      when /AudioPlayer/, /Playback/, /System/
         AudioPlayerRequest.new(@req)
       end
     end

@@ -21,4 +21,15 @@ describe 'AlexaRuby' do
       alexa.request.error_player_activity.must_equal 'string'
     end
   end
+
+  describe 'System request' do
+    before do
+      @json = File.read("#{@fpath}/system_request.json")
+    end
+
+    it 'should parse valid System request correctly' do
+      alexa = AlexaRuby.new(@json)
+      alexa.request.type.must_equal :audio_player
+    end
+  end
 end
