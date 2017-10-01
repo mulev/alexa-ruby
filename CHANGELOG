@@ -1,3 +1,8 @@
+[1.4.5]
+- Handle different Playback requests
+- Validate signature for all except AudioPlayer
+- Handle System requests
+
 [1.4.3]
 - Print original signature rather than decoded when raise validation error
 
