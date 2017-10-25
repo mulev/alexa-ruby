@@ -1,7 +1,7 @@
 module AlexaRuby
   # Amazon Alexa request context - application, user and device info
   class Context
-    attr_reader :app_id, :user, :device, :api_endpoint
+    attr_reader :app_id, :user, :device, :api_endpoint, :audio_state
 
     # Initialize new Context object
     #
@@ -14,6 +14,7 @@ module AlexaRuby
       @user = load_user(context[:System][:user])
       @device = load_device(context[:System][:device])
       @api_endpoint = context[:System][:apiEndpoint]
+      @audio_state = load_audio_state(context[:AudioPlayer])
     end
 
     private
@@ -40,6 +41,14 @@ module AlexaRuby
     # @return [Object] new Device object instance
     def load_device(params)
       Device.new(params)
+    end
+
+    # Initialize audio player state
+    #
+    # @param params [Hash] audio player parameters
+    # @return [Object] new AudioState object instance
+    def load_audio_state(params)
+      AudioState.new(params) unless params.nil?
     end
   end
 end
