@@ -18,6 +18,9 @@ describe 'AlexaRuby' do
         alexa.request.context.user.id.wont_be_nil
         alexa.request.context.device.wont_be_nil
         alexa.request.context.device.id.wont_be_nil
+        alexa.request.context.audio_state.token.must_be_nil
+        alexa.request.context.audio_state.playback_offset.wont_be_nil
+        alexa.request.context.audio_state.playback_state.wont_be_nil
       end
 
       it 'should raise ArgumentError if application ID is missing' do
