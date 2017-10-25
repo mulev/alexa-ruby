@@ -43,6 +43,13 @@ describe 'AlexaRuby' do
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Missing device ID'
       end
+
+      it 'should remain valid if audio player section is missing' do
+        req = Oj.load(@json, symbol_keys: true)
+        req[:context][:AudioPlayer] = nil
+        alexa = AlexaRuby.new(req)
+        alexa.request.context.audio_state.must_be_nil
+      end
     end
   end
 end
