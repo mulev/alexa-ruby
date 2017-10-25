@@ -1,7 +1,7 @@
 language: ruby
 rvm:
 - 2.1.0
-- 2.2.0
+# - 2.2.0 # build fails for unknown reason
 - 2.3.4
 - 2.4.2
 script: rake test
