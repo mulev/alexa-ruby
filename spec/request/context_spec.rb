@@ -18,6 +18,9 @@ describe 'AlexaRuby' do
         alexa.request.context.user.id.wont_be_nil
         alexa.request.context.device.wont_be_nil
         alexa.request.context.device.id.wont_be_nil
+        alexa.request.context.audio_state.token.must_be_nil
+        alexa.request.context.audio_state.playback_offset.wont_be_nil
+        alexa.request.context.audio_state.playback_state.wont_be_nil
       end
 
       it 'should raise ArgumentError if application ID is missing' do
@@ -39,6 +42,13 @@ describe 'AlexaRuby' do
         req[:context][:System][:device][:deviceId] = nil
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Missing device ID'
+      end
+
+      it 'should remain valid if audio player section is missing' do
+        req = Oj.load(@json, symbol_keys: true)
+        req[:context][:AudioPlayer] = nil
+        alexa = AlexaRuby.new(req)
+        alexa.request.context.audio_state.must_be_nil
       end
     end
   end
