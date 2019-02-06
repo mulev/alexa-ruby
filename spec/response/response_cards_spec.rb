@@ -9,16 +9,16 @@ describe 'AlexaRuby::Response' do
   describe 'Card' do
     before do
       @json = File.read("#{@req_path}/launch_request.json")
-      @card = Oj.load(
+      @card = JSON.parse(
         File.read("#{@resp_path}/sample_card.json"),
-        symbol_keys: true
+        symbolize_names: true
       )
       @alexa = AlexaRuby.new(@json)
     end
 
     it 'should add card to response' do
       @alexa.response.add_card(@card)
-      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp = JSON.parse(@alexa.response.json, symbolize_names: true)
       resp[:response][:card][:type].must_equal 'Simple'
       resp[:response][:card][:title].must_equal 'title'
       resp[:response][:card][:content].must_equal 'text'
@@ -34,7 +34,7 @@ describe 'AlexaRuby::Response' do
     it 'should add "text" and "image" nodes if card type is Standard' do
       @card[:type] = 'Standard'
       @alexa.response.add_card(@card)
-      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp = JSON.parse(@alexa.response.json, symbolize_names: true)
       small_url = 'https://test.ru/example_small.jpg'
       large_url = 'https://test.ru/example_large.jpg'
       resp[:response][:card][:type].must_equal 'Standard'

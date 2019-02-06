@@ -14,7 +14,7 @@ describe 'AlexaRuby::Response' do
 
     it 'should add plain text output to response' do
       @alexa.response.tell('Test')
-      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp = JSON.parse(@alexa.response.json, symbolize_names: true)
       resp[:response][:outputSpeech][:type].must_equal 'PlainText'
       resp[:response][:outputSpeech][:text].must_equal 'Test'
       resp[:response][:outputSpeech][:ssml].must_be_nil
@@ -22,7 +22,7 @@ describe 'AlexaRuby::Response' do
 
     it 'should add SSML output to response' do
       @alexa.response.tell('Test', nil, true)
-      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp = JSON.parse(@alexa.response.json, symbolize_names: true)
       resp[:response][:outputSpeech][:type].must_equal 'SSML'
       resp[:response][:outputSpeech][:ssml].must_equal '<speak>Test</speak>'
       resp[:response][:outputSpeech][:text].must_be_nil
@@ -30,7 +30,7 @@ describe 'AlexaRuby::Response' do
 
     it 'should add output with repromt' do
       @alexa.response.tell('Test', 'One more test')
-      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp = JSON.parse(@alexa.response.json, symbolize_names: true)
       resp[:response][:outputSpeech][:type].must_equal 'PlainText'
       resp[:response][:outputSpeech][:text].must_equal 'Test'
       resp[:response][:outputSpeech][:ssml].must_be_nil
@@ -41,9 +41,9 @@ describe 'AlexaRuby::Response' do
     end
 
     it 'should add output speech and return JSON' do
-      sample = Oj.load(
+      sample = JSON.parse(
         File.read("#{@resp_path}/sample_response.json"),
-        symbol_keys: true
+        symbolize_names: true
       )
       sample[:response][:reprompt] = {
         outputSpeech: {
@@ -51,22 +51,22 @@ describe 'AlexaRuby::Response' do
           text: 'Test'
         }
       }
-      @alexa.response.tell!('Test', 'Test').must_equal Oj.to_json(sample)
+      @alexa.response.tell!('Test', 'Test').must_equal JSON.generate(sample)
     end
 
     it 'should add output speech without closing session' do
       @alexa.response.ask('Test')
-      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp = JSON.parse(@alexa.response.json, symbolize_names: true)
       resp[:response][:shouldEndSession].must_equal false
     end
 
     it 'should add output speech without closing session and return JSON' do
-      sample = Oj.load(
+      sample = JSON.parse(
         File.read("#{@resp_path}/sample_response.json"),
-        symbol_keys: true
+        symbolize_names: true
       )
       sample[:response][:shouldEndSession] = false
-      @alexa.response.ask!('Test').must_equal Oj.to_json(sample)
+      @alexa.response.ask!('Test').must_equal JSON.generate(sample)
     end
   end
 end

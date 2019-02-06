@@ -88,7 +88,7 @@ module AlexaRuby
     #
     # @return [JSON] response object
     def json
-      Oj.to_json(@resp)
+      JSON.generate(@resp)
     end
 
     # Tell something to Alexa user and close conversation.

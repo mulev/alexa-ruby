@@ -14,7 +14,7 @@ describe 'AlexaRuby::Response' do
 
     it 'should add one session attribute correctly' do
       @alexa.response.add_session_attribute(:id, 'djsdhdsjhdsjhdsjh')
-      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp = JSON.parse(@alexa.response.json, symbolize_names: true)
       resp[:sessionAttributes][:id].must_equal 'djsdhdsjhdsjhdsjh'
     end
 
@@ -23,7 +23,7 @@ describe 'AlexaRuby::Response' do
         id: 'djsdhdsjhdsjhdsjh',
         test: 'test'
       )
-      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp = JSON.parse(@alexa.response.json, symbolize_names: true)
       resp[:sessionAttributes][:id].must_equal 'djsdhdsjhdsjhdsjh'
       resp[:sessionAttributes][:test].must_equal 'test'
     end
@@ -34,7 +34,7 @@ describe 'AlexaRuby::Response' do
         test: 'test'
       )
       @alexa.response.merge_session_attributes(token: '7783y3h43hg4ghh')
-      resp = Oj.load(@alexa.response.json, symbol_keys: true)
+      resp = JSON.parse(@alexa.response.json, symbolize_names: true)
       resp[:sessionAttributes][:id].must_equal 'djsdhdsjhdsjhdsjh'
       resp[:sessionAttributes][:test].must_equal 'test'
       resp[:sessionAttributes][:token].must_equal '7783y3h43hg4ghh'

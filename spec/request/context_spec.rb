@@ -24,28 +24,28 @@ describe 'AlexaRuby' do
       end
 
       it 'should raise ArgumentError if application ID is missing' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:context][:System][:application][:applicationId] = nil
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Missing application ID'
       end
 
       it 'should raise ArgumentError if user ID is missing' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:context][:System][:user][:userId] = nil
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Missing user ID'
       end
 
       it 'should raise ArgumentError if device ID is missing' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:context][:System][:device][:deviceId] = nil
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Missing device ID'
       end
 
       it 'should remain valid if audio player section is missing' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:context][:AudioPlayer] = nil
         alexa = AlexaRuby.new(req)
         alexa.request.context.audio_state.must_be_nil

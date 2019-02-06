@@ -22,7 +22,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency     'bundler', '>= 1.6.9'
   spec.add_runtime_dependency     'rake'
-  spec.add_runtime_dependency     'oj', '~> 3.0'
   spec.add_runtime_dependency     'addressable', '>= 2.5.1'
   spec.add_runtime_dependency     'httparty', '>= 0.15.5'
 

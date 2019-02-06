@@ -20,21 +20,21 @@ describe 'AlexaRuby' do
       end
 
       it 'should set OAuth access token if it is present in request' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:session][:user][:accessToken] = 'test'
         alexa = AlexaRuby.new(req)
         alexa.request.session.user.access_token.must_equal 'test'
       end
 
       it 'should raise ArgumentError if session isn\'t valid' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:session] = nil
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Empty user session'
       end
 
       it 'should raise ArgumentError if user ID is missing' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:session][:user][:userId] = nil
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Missing user ID'

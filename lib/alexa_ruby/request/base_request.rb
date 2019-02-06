@@ -30,7 +30,7 @@ module AlexaRuby
     #
     # @return [String] request json
     def json
-      Oj.to_json(@req)
+      JSON.generate(@req)
     end
 
     private
