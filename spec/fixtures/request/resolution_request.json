@@ -58,6 +58,8 @@
         "statusFilter": {
           "name": "statusFilter",
           "value": "yeah",
+          "confirmationStatus": "NONE",
+          "source": "USER",
           "resolutions": {
             "resolutionsPerAuthority": [
               {
@@ -67,9 +69,7 @@
                 }
               }
             ]
-          },
-          "confirmationStatus": "NONE",
-          "source": "USER"
+          }
         }
       }
     }

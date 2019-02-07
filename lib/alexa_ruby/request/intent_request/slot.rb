@@ -1,7 +1,7 @@
 module AlexaRuby
   # Class that encapsulates each slot
   class Slot
-    attr_accessor :name, :value, :confirmation_status, :resolved_values
+    attr_accessor :name, :value, :confirmation_status, :resolution_authorities, :resolved_values
 
     # Initialize slot and define its name and value
     #
