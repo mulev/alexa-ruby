@@ -22,6 +22,7 @@ describe 'AlexaRuby' do
     it 'no match authority with no resolved_values should return empty array' do
       alexa = AlexaRuby.new(@json)
       alexa.request.slots[0].name.must_equal 'statusFilter'
+      alexa.request.slots[0].resolution_authorities.first.status_code.must_equal :success_no_match
       alexa.request.slots[0].resolved_values.must_equal []
     end
   end
