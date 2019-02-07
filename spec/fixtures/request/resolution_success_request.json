@@ -1,0 +1,91 @@
+{
+  "version": "1.0",
+  "session": {
+    "new": false,
+    "sessionId": "amzn1.echo-api.session.0000000-0000-0000-0000-00000000000",
+    "application": {
+      "applicationId": "amzn1.echo-sdk-ams.app.000000-d0ed-0000-ad00-000000d00ebe"
+    },
+    "user": {
+      "userId": "amzn1.account.AM3B00000000000000000000000"
+    }
+  },
+  "context": {
+    "System": {
+      "application": {
+        "applicationId": "amzn1.echo-sdk-ams.app.000000-d0ed-0000-ad00-000000d00ebe"
+      },
+      "user": {
+        "userId": "amzn1.account.AM3B00000000000000000000000"
+      },
+      "device": {
+        "deviceId": "TEST",
+        "supportedInterfaces": {}
+      },
+      "apiEndpoint": "https://api.amazonalexa.com",
+      "apiAccessToken": "token"
+    },
+    "Viewport": {
+      "experiences": [
+        {
+          "arcMinuteWidth": 246,
+          "arcMinuteHeight": 144,
+          "canRotate": false,
+          "canResize": false
+        }
+      ],
+      "shape": "RECTANGLE",
+      "pixelWidth": 1024,
+      "pixelHeight": 600,
+      "dpi": 160,
+      "currentPixelWidth": 1024,
+      "currentPixelHeight": 600,
+      "touch": [
+        "SINGLE"
+      ]
+    }
+  },
+  "request": {
+    "type": "IntentRequest",
+    "requestId": "amzn1.echo-api.request.0000000-0000-0000-0000-00000000000",
+    "timestamp": "2019-02-06T22:09:26Z",
+    "locale": "en-US",
+    "dialogState": "COMPLETED",
+    "intent": {
+      "name": "RebuildLatest",
+      "confirmationStatus": "CONFIRMED",
+      "slots": {
+        "edgeVersion": {
+          "name": "edgeVersion",
+          "value": "9732",
+          "confirmationStatus": "CONFIRMED",
+          "source": "USER"
+        },
+        "statusFilter": {
+          "name": "statusFilter",
+          "value": "all",
+          "confirmationStatus": "NONE",
+          "source": "USER",
+          "resolutions": {
+            "resolutionsPerAuthority": [
+              {
+                "authority": "skill.arn.statusFilter",
+                "status": {
+                  "code": "ER_SUCCESS_MATCH"
+                },
+                "values": [
+                  {
+                    "value": {
+                      "name": "both",
+                      "id": "BOTH"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

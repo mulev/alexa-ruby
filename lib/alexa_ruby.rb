@@ -2,6 +2,7 @@
 require 'addressable/uri'
 require 'securerandom'
 require 'json'
+require 'ostruct'
 
 # Gem core
 require 'alexa_ruby/alexa'
@@ -18,6 +19,7 @@ require 'alexa_ruby/request/audio_player_request'
 require 'alexa_ruby/request/launch_request'
 require 'alexa_ruby/request/intent_request'
 require 'alexa_ruby/request/intent_request/slot'
+require 'alexa_ruby/request/intent_request/resolution_authority'
 require 'alexa_ruby/request/session_ended_request'
 require 'alexa_ruby/response/response'
 require 'alexa_ruby/response/audio_player'
