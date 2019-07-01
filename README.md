@@ -6,6 +6,13 @@
 [![Code Climate](https://codeclimate.com/github/mulev/alexa-ruby/badges/gpa.svg)](https://codeclimate.com/github/mulev/alexa-ruby)
 [![Coverage Status](https://coveralls.io/repos/github/mulev/alexa-ruby/badge.svg?branch=develop)](https://coveralls.io/github/mulev/alexa-ruby?branch=develop)
 
+---
+
+Since I have now some spare time, I plan to completely revise this project and make it at least up to date with the latest Alexa custom skills API.  
+Maybe even more.
+
+---
+
 Originally forked from [damianFC's AlexaRubykit](https://github.com/damianFC/alexa-rubykit), this gem implements a convenient back-end service for interaction with Amazon Alexa API.
 
 ## Installation
