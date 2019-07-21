@@ -20,7 +20,7 @@ describe 'AlexaRuby' do
     end
 
     it 'should raise an ArgumentError if intent is undefined' do
-      req = Oj.load(@json, symbol_keys: true)
+      req = JSON.parse(@json, symbolize_names: true)
       req[:request][:intent] = nil
       err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
       err.message.must_equal 'Intent must be defined'

@@ -54,7 +54,7 @@ module AlexaRuby
     #
     # @return [Boolean]
     def valid_certificates?
-      Certificates.new(@chain_url, @signature, Oj.to_json(@request)).valid?
+      Certificates.new(@chain_url, @signature, JSON.generate(@request)).valid?
     end
   end
 end

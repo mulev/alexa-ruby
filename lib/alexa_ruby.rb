@@ -1,7 +1,8 @@
 # Utilities
 require 'addressable/uri'
-require 'oj'
 require 'securerandom'
+require 'json'
+require 'ostruct'
 
 # Gem core
 require 'alexa_ruby/alexa'
@@ -18,6 +19,7 @@ require 'alexa_ruby/request/audio_player_request'
 require 'alexa_ruby/request/launch_request'
 require 'alexa_ruby/request/intent_request'
 require 'alexa_ruby/request/intent_request/slot'
+require 'alexa_ruby/request/intent_request/resolution_authority'
 require 'alexa_ruby/request/session_ended_request'
 require 'alexa_ruby/response/response'
 require 'alexa_ruby/response/audio_player'
@@ -51,8 +53,8 @@ module AlexaRuby
     # @return [Hash] valid builded JSON
     # @raise [ArgumentError] if given object isn't a valid JSON object
     def build_json(obj)
-      obj = Oj.generate(obj) if hash?(obj)
-      Oj.load(obj, symbol_keys: true)
+      obj = JSON.generate(obj) if hash?(obj)
+      JSON.parse(obj, symbolize_names: true)
     rescue StandardError
       raise ArgumentError, 'Request must be a valid JSON object'
     end

@@ -22,12 +22,12 @@ describe 'AlexaRuby' do
       end
 
       it 'should build a Request object for valid Hash' do
-        alexa = AlexaRuby.new(Oj.load(@json))
+        alexa = AlexaRuby.new(JSON.parse(@json))
         alexa.request.wont_be_nil
       end
 
       it 'should build a Response object for valid Hash' do
-        alexa = AlexaRuby.new(Oj.load(@json))
+        alexa = AlexaRuby.new(JSON.parse(@json))
         alexa.response.wont_be_nil
       end
 
@@ -52,28 +52,28 @@ describe 'AlexaRuby' do
       end
 
       it 'should raise ArgumentError if request ID is missing' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:request][:requestId] = nil
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Missing request ID'
       end
 
       it 'should raise ArgumentError if request timestamp is missing' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:request][:timestamp] = nil
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Missing request timestamp'
       end
 
       it 'should raise ArgumentError if request type unknown' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:request][:type] = 'dummy'
         err = proc { AlexaRuby.new(req) }.must_raise ArgumentError
         err.message.must_equal 'Unknown type of Alexa request'
       end
 
       it 'should raise ArgumentError if request structure isn\'t valid' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:request] = nil
         msg = 'Invalid request structure, ' \
               'please, refer to the Amazon Alexa manual: ' \
@@ -84,7 +84,7 @@ describe 'AlexaRuby' do
       end
 
       it 'should not raise ArgumentError if request structure isn\'t valid and validations are disabled' do
-        req = Oj.load(@json, symbol_keys: true)
+        req = JSON.parse(@json, symbolize_names: true)
         req[:version] = nil
         alexa = AlexaRuby.new(req, disable_validations: true)
         alexa.request.version.must_be_nil
@@ -92,7 +92,7 @@ describe 'AlexaRuby' do
 
       it 'should return received request in JSON format' do
         alexa = AlexaRuby.new(@json)
-        sample = Oj.to_json(Oj.load(@json))
+        sample = JSON.generate(JSON.parse(@json))
         alexa.request.json.must_equal sample
       end
     end
